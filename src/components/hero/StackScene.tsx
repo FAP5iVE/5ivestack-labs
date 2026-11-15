@@ -19,8 +19,9 @@ import { reportWebglLost, stepDownTier } from "@/lib/tier";
 type Rig = {
   assemble: number; // 0 to 1, load animation
   explode: number; // 0 to 1, scroll through the first screen
-  px: number; // pointer, -1 to 1 (Tier 2 only)
+  px: number; // pointer, -1 to 1 (Tier 2 hero only)
   py: number;
+  focus: number; // layer level 1 to 5 to highlight, 0 for none (Systems walk)
 };
 
 type Colors = { ink: THREE.Color; paper: THREE.Color; sky: THREE.Color; orange: THREE.Color };
@@ -48,6 +49,7 @@ uniform float uMode;
 uniform float uTime;
 uniform float uSeed;
 uniform float uReveal;
+uniform float uDim;
 uniform vec3 uSky;
 uniform vec3 uOrange;
 varying vec2 vUv;
@@ -175,7 +177,7 @@ void main() {
   float vis = 1.0 - smoothstep(uReveal * 1.2 - 0.2, uReveal * 1.2, sweep);
 
   vec3 col = mix(uSky, uOrange, clamp(sig, 0.0, 1.0));
-  float alpha = max(body * 0.6, sig) * vis;
+  float alpha = max(body * 0.6, sig) * vis * mix(1.0, 0.3, uDim);
   gl_FragColor = vec4(col, alpha);
   #include <colorspace_fragment>
 }
@@ -197,6 +199,8 @@ function Stack({ rig, tier, colors }: { rig: RefObject<Rig>; tier: 1 | 2; colors
   const packetRefs = useRef<(THREE.Mesh | null)[]>([]);
   const time = useRef(0);
   const fitted = useRef(false);
+  const edgeRefs = useRef<(THREE.LineBasicMaterial | null)[]>([]);
+  const focusAmt = useRef<number[]>([0, 0, 0, 0, 0]);
 
   const box = useMemo(() => new THREE.BoxGeometry(SLAB, THICKNESS, SLAB), []);
   const edges = useMemo(() => new THREE.EdgesGeometry(box), [box]);
@@ -207,6 +211,7 @@ function Stack({ rig, tier, colors }: { rig: RefObject<Rig>; tier: 1 | 2; colors
         uTime: { value: 0 },
         uSeed: { value: layer.seed },
         uReveal: { value: 0 },
+        uDim: { value: 0 },
         uSky: { value: colors.sky },
         uOrange: { value: colors.orange },
       })),
@@ -230,19 +235,30 @@ function Stack({ rig, tier, colors }: { rig: RefObject<Rig>; tier: 1 | 2; colors
     }
 
     const spacing = spacingOf(rig.current);
+    const focus = rig.current.focus;
+    const kFocus = Math.min(1, dt * 6);
     layers.forEach((layer, i) => {
+      // Smoothly lift the focused layer and dim the others (Systems walk).
+      const amounts = focusAmt.current;
+      const target = layer.level === focus ? 1 : 0;
+      const amount = (amounts[i] ?? 0) + (target - (amounts[i] ?? 0)) * kFocus;
+      amounts[i] = amount;
       const slab = slabRefs.current[i];
-      if (slab) slab.position.y = (layer.level - 3) * spacing;
+      if (slab) slab.position.y = (layer.level - 3) * spacing + 0.28 * amount;
       const mat = matRefs.current[i];
       if (mat) {
         const uTime = mat.uniforms["uTime"];
         const uReveal = mat.uniforms["uReveal"];
+        const uDim = mat.uniforms["uDim"];
         if (uTime) uTime.value = t;
         if (uReveal) uReveal.value = Math.min(1, Math.max(0, (assemble - i * 0.06) / 0.7));
+        if (uDim) uDim.value = focus > 0 ? 1 - amount : 0;
       }
+      const edge = edgeRefs.current[i];
+      if (edge) edge.opacity = focus > 0 ? 0.25 + 0.55 * amount : 0.6;
     });
 
-    const total = 4 * spacing + 0.5;
+    const total = 4 * spacing;
     const rod = rodRef.current;
     if (rod) rod.scale.y = total;
     packetRefs.current.forEach((packet, i) => {
@@ -275,7 +291,14 @@ function Stack({ rig, tier, colors }: { rig: RefObject<Rig>; tier: 1 | 2; colors
             <meshBasicMaterial color={colors.ink} />
           </mesh>
           <lineSegments geometry={edges}>
-            <lineBasicMaterial color={colors.paper} transparent opacity={0.6} />
+            <lineBasicMaterial
+              ref={(el) => {
+                edgeRefs.current[i] = el;
+              }}
+              color={colors.paper}
+              transparent
+              opacity={0.6}
+            />
           </lineSegments>
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, THICKNESS / 2 + 0.002, 0]}>
             <planeGeometry args={[SLAB - 0.2, SLAB - 0.2]} />
@@ -348,13 +371,17 @@ function FpsGuard() {
 export default function StackScene({
   tier,
   active,
+  mode,
+  focus,
   onReady,
 }: {
   tier: 1 | 2;
   active: boolean;
+  mode: "hero" | "walk";
+  focus: number;
   onReady: () => void;
 }) {
-  const rig = useRef<Rig>({ assemble: 0, explode: 0, px: 0, py: 0 });
+  const rig = useRef<Rig>({ assemble: 0, explode: 0, px: 0, py: 0, focus: 0 });
   const colors = useMemo<Colors>(
     () => ({
       ink: readToken("ink"),
@@ -369,16 +396,21 @@ export default function StackScene({
     gsap.registerPlugin(ScrollTrigger);
     const state = rig.current;
     const tween = gsap.to(state, { assemble: 1, duration: 1.8, ease: "power3.out", delay: 0.2 });
-    // Layers separate further as the visitor scrolls through the first screen.
-    const trigger = ScrollTrigger.create({
-      start: 0,
-      end: () => window.innerHeight * 0.9,
-      onUpdate: (self) => {
-        state.explode = self.progress;
-      },
-    });
+    const walk = mode === "walk";
+    // Hero: layers separate further as the visitor scrolls through the first screen.
+    // Walk: layers stay fully separated and the page drives `focus` instead.
+    if (walk) state.explode = 1;
+    const trigger = walk
+      ? null
+      : ScrollTrigger.create({
+          start: 0,
+          end: () => window.innerHeight * 0.9,
+          onUpdate: (self) => {
+            state.explode = self.progress;
+          },
+        });
     let onMove: ((event: PointerEvent) => void) | null = null;
-    if (tier === 2) {
+    if (tier === 2 && !walk) {
       onMove = (event) => {
         state.px = (event.clientX / window.innerWidth) * 2 - 1;
         state.py = (event.clientY / window.innerHeight) * 2 - 1;
@@ -387,10 +419,14 @@ export default function StackScene({
     }
     return () => {
       tween.kill();
-      trigger.kill();
+      trigger?.kill();
       if (onMove) window.removeEventListener("pointermove", onMove);
     };
-  }, [tier]);
+  }, [tier, mode]);
+
+  useEffect(() => {
+    rig.current.focus = focus;
+  }, [focus]);
 
   return (
     <div className="absolute inset-0 touch-pan-y">

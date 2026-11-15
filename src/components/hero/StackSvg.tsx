@@ -92,7 +92,8 @@ function pattern(mode: number): Seg[] {
   }
 }
 
-export function StackSvg() {
+/** `focus` is a layer level (1 to 5) to highlight in the Systems walk; 0 shows all layers equally. */
+export function StackSvg({ focus = 0 }: { focus?: number }) {
   const ordered = [...layers].sort((a, b) => a.level - b.level);
   return (
     <svg
@@ -107,8 +108,17 @@ export function StackSvg() {
         const top = `M${CX} ${y - B} L${CX + A} ${y} L${CX} ${y + B} L${CX - A} ${y} Z`;
         const left = `M${CX - A} ${y} L${CX} ${y + B} L${CX} ${y + B + T} L${CX - A} ${y + T} Z`;
         const right = `M${CX + A} ${y} L${CX} ${y + B} L${CX} ${y + B + T} L${CX + A} ${y + T} Z`;
+        const isActive = focus === layer.level;
+        const dimmed = focus > 0 && !isActive;
         return (
-          <g key={layer.level}>
+          <g
+            key={layer.level}
+            style={{
+              opacity: dimmed ? 0.3 : 1,
+              transform: `translateY(${isActive ? -14 : 0}px)`,
+              transition: "opacity 400ms, transform 400ms",
+            }}
+          >
             <path d={left} className="fill-ink stroke-paper" strokeOpacity={0.6} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
             <path d={right} className="fill-ink stroke-paper" strokeOpacity={0.6} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
             <path d={top} className="fill-ink stroke-paper" strokeOpacity={0.8} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />

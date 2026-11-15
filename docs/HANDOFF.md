@@ -1,6 +1,6 @@
 # Handoff: where the project stands
 
-Last updated: 15 Nov 2026, end of milestone M2 (hero). M0, M1 and M2 are all written but NOT build-verified.
+Last updated: 15 Nov 2026. M0 to M2 and the first part of M3 (Systems walk) are written. The owner ran M2 locally and sent desktop screenshots (section 2); phones and the interactive behaviour are still unverified.
 Read this first, then `docs/DECISIONS.md`. Update this file at the end of every working session: status, remaining work, open questions, change log.
 
 Plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre
@@ -17,9 +17,21 @@ A bespoke, scroll-driven, phone-first website for 5iveStack Labs. Audience: loca
 | `scripts/check-banned.mjs` | Run, passes on the repo; self-tested on a deliberately bad file |
 | `pnpm install` | **NOT run** (M1 added `gsap`, `lenis`, `cmdk`; M2 added `three`, `@react-three/fiber`, `@types/three`). The build environment cannot install packages. No `pnpm-lock.yaml` exists yet |
 | `pnpm build`, `pnpm lint`, `pnpm typecheck` | **NOT run.** All TypeScript, CSS, GLSL and config in M0 to M2 is hand-written against the official `create-next-app` 16.4.6 template and is untested |
-| Visual check on phone and desktop | **NOT done** |
+| Visual check on desktop | **Partly done** from three owner screenshots (see below) |
+| Visual check on phone | **NOT done** |
 
-So M0 and M1 are "code complete, unverified". The first person to run it must follow section 3 and record the results in the change log.
+So M0 to M3a are "code complete" and only partly verified (the owner has run M2 on a desktop). The first person to run it must follow section 3 and record the results in the change log.
+
+### Verified so far (owner's desktop screenshots, 15 Nov 2026, build of M2)
+Three screenshots of the home page at about 1820px wide, development mode:
+- The project installs and runs; the home page renders.
+- Headline in Hubot Sans at its expanded width; body text and labels render in the intended families (Switzer, JetBrains Mono for `Ctrl K` and `L1` style labels). Looks right; confirm in devtools when convenient.
+- The WebGL scene renders: all five layers show their own pattern (interface wireframe, code lines, network lattice with orange nodes, chips with some lit orange, circuit traces), the orange signal bar runs through the stack, and no layer is clipped at rest. This means the GLSL shader compiled.
+- The orange progress bar under the header grows with scroll (partial mid-page, full at the bottom).
+- Footer shows email, phone, WhatsApp and the Simple mode button (Off). Header shows the Systems/Layers link and `Menu  Ctrl K`.
+- One defect spotted and fixed: the orange signal bar poked out below the bottom layer (now exactly spans L1 to L5).
+
+NOT yet confirmed: browser console warnings or errors; `html[data-tier]` values; Lenis smoothing; opening, searching and closing the command palette; turning Simple mode on and off; layers separating on scroll; FPS step-down; the SVG-to-WebGL crossfade; the headline at other widths; and **every phone check**. The owner's priority is seamless display on any phone, so a phone screenshot set (home, menu open, Systems walk) at the S20 Ultra's width is the most useful next test.
 
 ## 3. First-run checklist (do this before starting M3)
 
@@ -84,6 +96,15 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 - [ ] Turn on a phone's battery saver or Data Saver and reload: the site should show the SVG (Save-Data or reduced motion).
 - [ ] In the layers list, every row reads cleanly at 320px (the value label above the layer name).
 
+### M3a checks (Systems walk)
+- [ ] Desktop: the `Systems` link scrolls to "Five layers, one team", the dark viewport stays beside the steps while you scroll, and as each step (L1 up to L5) crosses the middle of the screen the matching layer lifts and the others dim. The orange marker beside the active step appears.
+- [ ] After the last step ("IT and technical consultation") no layer is highlighted.
+- [ ] Phone: the viewport sits under the header at about 38% of the screen height and stays there while the steps scroll beneath it; all five layers are still visible; text is never hidden behind the viewport except while scrolling under it.
+- [ ] No horizontal scroll at 320 to 430px. The viewport is not clipped.
+- [ ] Simple mode on: the SVG version does the same lifting and dimming (no canvas). With reduced motion the change is instant.
+- [ ] Two canvases exist at most. The second (Systems) is created only when you first scroll near it; the first pauses when off screen.
+- [ ] Keyboard: the page works with Tab only (no focus traps in the sticky viewport).
+
 5. If `next build` complains about `LayoutProps` or similar type helpers, note it: the template uses generated types that appear after the first `next dev` or `next build`. Run `pnpm dev` once, then `pnpm typecheck`.
 6. Record results under "Change log" below.
 
@@ -95,7 +116,7 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `eslint.config.mjs`, `.gitignore`, `.nvmrc` | Config (see D-01, D-14) |
 | `src/app/globals.css` | **All design tokens**: palette, radius, easing, type scale, grid, safe-area, base layer. Tailwind defaults for colour, shadow, blur, radius, animation, easing and text size are wiped |
 | `src/app/layout.tsx` | Root layout: Hubot Sans, Switzer and JetBrains Mono via `next/font/local`, viewport (`viewportFit: cover`), `noindex` metadata (D-32), skip link, `ScrollEngine`, `Header`, `Footer` |
-| `src/app/page.tsx` | **Home page**: hero (headline, placeholder description, WhatsApp and email actions, dark viewport) and the five-layer text list (D-26) |
+| `src/app/page.tsx` | **Home page**: hero (headline, placeholder description, WhatsApp and email actions, dark viewport) and the Systems walk (D-26, D-36) |
 | `src/app/tokens/page.tsx` | Developer-only token proof sheet at `/tokens` (noindex, unlinked, removed in M5) |
 | `src/app/favicon.ico`, `icon.svg`, `apple-icon.png` | Favicon set from the brand pack |
 | `src/fonts/` | Hubot Sans and JetBrains Mono woff2 (Latin subset, OFL) and Switzer variable woff2 (FFL, unmodified), each with its licence file. **Keep the repository private** (D-33) |
@@ -107,7 +128,8 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | `src/content/nav.ts` | Navigation items. Only sections that exist. Planned: Systems, Work, Lab, Consult |
 | `src/content/site.ts` | Company name, contact details (owner supplied), PLACEHOLDER description (D-30, D-31) |
 | `src/content/layers.ts` | The five layers: values, names, summaries (PLACEHOLDER), shader mode and seed (D-25) |
-| `src/components/hero/StackViewport.tsx` | Dark viewport: SVG, then lazily loaded WebGL scene, with error boundary, visibility pausing (D-28) |
+| `src/components/hero/StackViewport.tsx` | Dark viewport used by hero and Systems walk: SVG, then lazily loaded WebGL scene (mounted only once near the screen), error boundary, visibility pausing; props `mode`, `focus`, `className` (D-28, D-36) |
+| `src/components/hero/SystemsWalk.tsx` | The Systems section: sticky viewport plus five steps L1 to L5; highlights the active layer (D-36) |
 | `src/components/hero/StackSvg.tsx` | Static SVG five-layer stack (Tier 0 and loading placeholder) |
 | `src/components/hero/StackScene.tsx` | R3F scene: procedural slabs, GLSL patterns, signal bus, FPS guard (D-27) |
 | `docs/privacy-notice-draft.md` | Draft privacy notice, form notice and owner compliance map. **Needs legal review** (Q-08) |
@@ -135,7 +157,7 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | M0 foundation | Tokens, fonts, logo, checks | none | **Written, unverified** |
 | M1 scroll and shell | Lenis plus GSAP lifecycle, header, skip link, command palette with visible phone Menu button, Simple mode toggle, rendering-tier detection | `gsap`, `lenis`, `cmdk` (`@gsap/react` moved to M2, D-02) | **Written, unverified.** Anchors, keyboard, focus, reduced motion all work on a real phone (M1 checks above) |
 | M2 hero | **Written, unverified** (D-25 to D-32). Single canvas in the hero viewport (not Drei `View`, D-26), five procedural layers, trace shader (orange signal, sky and paper lines, no bloom), load sequence, SVG Tier 0, step-down, context-loss handling | `three`, `@react-three/fiber`, `@react-three/drei`, `@gsap/react` (+ `@types/three`) | Smooth on a mid-range Android, or the visitor lands on Tier 0 unharmed. Removes the M0 proof page |
-| M3 sections | Systems walk (CSS sticky plus ScrollTrigger progress), Work drawers, Lab, Principles, then two added Lab demos | `@react-three/rapier` (Lab only, lazy) | All content real; every drawer works by touch |
+| M3 sections (3a Systems walk is written, D-36; Work, Lab and Principles wait for content) | Systems walk (CSS sticky plus ScrollTrigger progress), Work drawers, Lab, Principles, then two added Lab demos | `@react-three/rapier` (Lab only, lazy) | All content real; every drawer works by touch |
 | M4 consultation | Step-by-step configurator, route handler, email, spam checks | `zod`, email provider SDK (default pick Resend: confirm limits and domain verification first) | A phone-submitted test request arrives in the inbox |
 | M5 hardening | Profiling, bundle analysis, image and font audit, accessibility review, SEO, Vercel deploy, real-device pass | `r3f-perf` (dev) | Budgets met on the throttled mobile profile |
 
@@ -199,3 +221,4 @@ Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (
 | 15 Nov 2026 | Claude | M1 written: tier detection and Simple mode, Lenis plus GSAP ScrollTrigger lifecycle (lazy, fine-pointer only), page progress bar, sticky header, skip link, cmdk command palette (full-screen on phone), minimal footer, Lenis CSS, `scroll-padding-top`. Dependencies added: gsap 3.15.1, lenis 1.3.27, cmdk 1.1.1 (versions verified against the npm registry and their READMEs and type files). GSAP licence resolved (D-22). Contrast and banned-pattern scripts pass. Install, build, lint, typecheck and all browser checks still outstanding. |
 | 15 Nov 2026 | Claude | M2 (hero) written: home page, hero copy (placeholder), static SVG stack, lazily loaded procedural WebGL stack with five GLSL patterns, signal bus, scroll and pointer choreography, FPS step-down, error and context-loss fallbacks, five-layer text list, owner contact details in hero, footer and palette. Proof sheet moved to `/tokens`. Deps added: `three` 0.187.0, `@react-three/fiber` 9.8.2, `@types/three`. Owner answered Q-01, Q-02, Q-03, Q-10, partly Q-04 and Q-06. Layer labels L4 and L5 changed to Scalability and Usability (D-25). Dates in earlier entries corrected (several said 16 Nov by mistake). Nothing in M2 has been run. |
 | 15 Nov 2026 | Claude | Switzer supplied by the owner and bundled through `next/font/local` (D-33); interim `@font-face` removed. Licence read: private repository required, no subsetting. Privacy notice draft written from the primary text of the Malawi Data Protection Act 2024 (D-34). |
+| 15 Nov 2026 | Claude | Owner ran M2 and sent three desktop screenshots (D-35): renders correctly. Fixed the signal bar overshooting the bottom layer. Built M3a: Systems walk (sticky viewport, layer highlighting, `services` per layer), lazy mounting of each scene, `#systems` nav. Phone verification still outstanding. |

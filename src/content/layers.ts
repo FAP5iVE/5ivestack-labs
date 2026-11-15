@@ -12,6 +12,8 @@ export type Layer = {
   value: string;
   name: string;
   summary: string;
+  /** Service names from the owner's company scope (not placeholder copy). */
+  services: readonly string[];
   /** Which procedural pattern the WebGL shader and SVG draw on this layer. */
   mode: 0 | 1 | 2 | 3 | 4;
   /** Random seed for the shader pattern. */
@@ -25,6 +27,7 @@ export const layers: readonly Layer[] = [
     name: "Hardware and sensors",
     summary:
       "Embedded systems and IoT hardware, from custom boards to the sensors that feed them.",
+    services: ["Embedded systems and IoT hardware design"],
     mode: 0,
     seed: 1.7,
   },
@@ -34,6 +37,7 @@ export const layers: readonly Layer[] = [
     name: "Firmware and device networks",
     summary:
       "Firmware, connected devices and enterprise hardware setup, installed and configured to keep running.",
+    services: ["Enterprise hardware setup, installation and configuration"],
     mode: 1,
     seed: 4.3,
   },
@@ -43,6 +47,7 @@ export const layers: readonly Layer[] = [
     name: "Networks and physical security",
     summary:
       "Network design, installation and configuration, and CCTV installation that protects people and property.",
+    services: ["Network design, installation and configuration", "CCTV and physical security installation"],
     mode: 2,
     seed: 2.9,
   },
@@ -52,6 +57,7 @@ export const layers: readonly Layer[] = [
     name: "Software and backend",
     summary:
       "Custom software solutions and full-stack web platforms, built so they can grow.",
+    services: ["Custom software solutions", "Full-stack web platforms"],
     mode: 3,
     seed: 6.1,
   },
@@ -61,6 +67,7 @@ export const layers: readonly Layer[] = [
     name: "Android and interfaces",
     summary:
       "Native and cross-platform Android apps and web interfaces that people can use without training.",
+    services: ["Android applications, native and cross-platform"],
     mode: 4,
     seed: 3.4,
   },

@@ -148,7 +148,7 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 **Status:** My pick, awaiting the owner's confirmation of the exact words (HANDOFF Q-11). Proceed with these meanwhile.
 
 ## D-26 Home page structure and the proof sheet (15 Nov, M2)
-**Decision:** `/` is now the real home page: hero (headline, placeholder description, contact actions, dark viewport) followed by a text list of the five layers plus the consultation row. The list is the accessible equivalent of the viewport graphic and is ordered top to bottom as the stack appears (L5 at the top). The M0 proof sheet moved to `/tokens` (noindex, not linked, removed in M5).
+**Decision:** `/` is now the real home page: hero (headline, placeholder description, contact actions, dark viewport) followed by the five layers as readable text. In M2 this was a plain list ordered as the stack appears (L5 at the top); in M3a the list became the Systems walk (D-36), which carries the same text and reads in order L1 to L5. The M0 proof sheet moved to `/tokens` (noindex, not linked, removed in M5).
 **Deviation from the plan:** The plan called for one shared canvas via Drei `View` for the hero and the Systems walk. M2 uses a single plain `Canvas` inside the hero viewport. Revisit in M3: the Systems walk can either reuse the same sticky viewport or adopt `View`.
 **Status:** Decided.
 
@@ -156,7 +156,7 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 **Decision:** `StackScene.tsx` is fully procedural: no model files, textures or postprocessing, and no glow.
 - Orthographic camera at about 24 degrees elevation and 45 degrees azimuth (position 12.95, 8, 12.95), matching the SVG's rhombus proportions (half height about 0.4 of half width). Zoom is recomputed from the container size so all five layers fit even at full scroll separation.
 - Each layer is an ink slab with paper edges and a plane carrying a custom GLSL pattern: traces (L1), chips and pins (L2), network lattice (L3), code lines with a blinking cursor (L4), interface wireframe (L5). Sky draws structure, orange draws signal. Colours are read from the CSS tokens at runtime.
-- An orange signal bus with three travelling packets stands at the front corner and links the layers.
+- An orange signal bus with three travelling packets stands at the front corner and links the layers. It spans exactly L1 to L5 (it first overshot the bottom layer, seen in the owner's screenshot and fixed).
 - Load animation: layers rise apart and their patterns sweep in (GSAP, 1.8s, power3.out). Scroll: layers separate by up to 25% more across the first screen (ScrollTrigger progress written into a ref). Tier 2: gentle tilt following the pointer. Tier 1: slow self-drift, no pointer handlers, so vertical page scrolling is never trapped (`touch-action: pan-y`).
 - Anti-aliasing only on Tier 2; pixel ratio capped at 2 (Tier 2) and 1.5 (Tier 1).
 - Per-frame code mutates refs and uniforms only; nothing calls `setState` in the frame loop.
@@ -202,6 +202,19 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 - Section 53 gave non-significant controllers a 24-month exemption from commencement; with commencement reported as 3 June 2024, that exemption appears to have ended around 3 June 2026, so the Act should be treated as applicable now. Confirm the Gazette commencement date.
 - It is a draft, not legal advice. A Malawian lawyer must review it before publication.
 **Status:** Draft. Build `/privacy` and the form notice in M4.
+
+## D-35 First verification: owner's desktop screenshots (15 Nov 2026)
+**Record:** The owner ran M2 locally and sent three desktop screenshots (about 1820px wide, development mode). They show the home page rendering, the five-layer WebGL scene with all patterns (so the shader compiled), the orange progress bar, the footer with contact links and the Simple mode button, and the new fonts. One defect was visible (signal bar overshooting the bottom layer) and was fixed. Nothing was shown about phones, the console, the command palette, Simple mode switching or tier behaviour. Full list: HANDOFF section 2.
+**Status:** Partial verification. Phone checks remain the priority.
+
+## D-36 Systems walk (15 Nov 2026, M3a)
+**Decision:** The "Five layers, one team" list became the Systems walk (`SystemsWalk.tsx`), anchored at `#systems` (header and palette link updated).
+- A dark viewport stays visible with CSS `position: sticky`, not ScrollTrigger pinning, so phones keep native scrolling and avoid address-bar resize problems (plan section 5). On phones it sits under the header at 38% of the screen height; on desktop it sits beside the text.
+- An `IntersectionObserver` with a 1%-tall band 60% of the way down the screen decides the active step; React state changes only when the active step changes. The viewport receives `focus` (layer level 1 to 5, or 0 for none). In WebGL the focused layer lifts by 0.28 units while others dim (shader alpha down to 30%, edges down to 25%); in the SVG fallback the focused layer lifts 14 units and the others fade to 30%. The orange marker beside the active step is the "active indicator" use of orange.
+- Reuses `StackViewport` and `StackScene` (new `mode="walk"`: layers stay fully separated, no scroll scrubbing, no pointer tilt). There are at most two WebGL contexts on the page, and each scene is mounted only when its viewport first comes within 100px of the screen, so the Systems scene costs nothing until needed.
+- Layers now carry a `services` list taken from the owner's company scope (real service names, not placeholder copy).
+**Not done:** a rendering-tier-aware reduction of the walk on very low-end phones beyond what Tier 0/1 already do. If the second canvas hurts performance on the S20 Ultra, the fix is to reuse a single canvas.
+**Status:** Decided. Unverified.
 
 ---
 

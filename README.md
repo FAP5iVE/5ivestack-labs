@@ -47,7 +47,7 @@ pnpm build          # production build
 
 ```
 src/app/        layout.tsx, page.tsx (home), tokens/page.tsx (developer-only proof sheet), globals.css (tokens), icons
-src/components/hero/   StackViewport, StackSvg, StackScene (five-layer hero)
+src/components/hero/   StackViewport, StackSvg, StackScene, SystemsWalk (five-layer hero and Systems walk)
 src/components/shell/  Header, CommandPalette, ScrollEngine, Footer, SimpleModeToggle
 src/lib/        tier.ts (rendering tier, Simple mode), scroll.ts (Lenis instance and lock)
 src/content/    nav.ts, site.ts (contact and placeholder copy), layers.ts (the five layers)
