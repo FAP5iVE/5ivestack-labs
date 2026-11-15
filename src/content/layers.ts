@@ -1,0 +1,74 @@
+/*
+  The five layers, from hardware (L1) to software (L5). One source of truth for
+  the hero scene, the SVG fallback and the text list on the page.
+  Value labels were confirmed by the owner on 15 Nov 2026. L4 and L5 replace the
+  originally proposed "Innovation" and "Creativity" (buzzwords) with concrete,
+  testable qualities. See docs/DECISIONS.md D-25.
+  The summaries below are PLACEHOLDER copy to be replaced with proof lines from
+  real work (HANDOFF Q-04).
+*/
+export type Layer = {
+  level: 1 | 2 | 3 | 4 | 5;
+  value: string;
+  name: string;
+  summary: string;
+  /** Which procedural pattern the WebGL shader and SVG draw on this layer. */
+  mode: 0 | 1 | 2 | 3 | 4;
+  /** Random seed for the shader pattern. */
+  seed: number;
+};
+
+export const layers: readonly Layer[] = [
+  {
+    level: 1,
+    value: "Precision",
+    name: "Hardware and sensors",
+    summary:
+      "Embedded systems and IoT hardware, from custom boards to the sensors that feed them.",
+    mode: 0,
+    seed: 1.7,
+  },
+  {
+    level: 2,
+    value: "Reliability",
+    name: "Firmware and device networks",
+    summary:
+      "Firmware, connected devices and enterprise hardware setup, installed and configured to keep running.",
+    mode: 1,
+    seed: 4.3,
+  },
+  {
+    level: 3,
+    value: "Security",
+    name: "Networks and physical security",
+    summary:
+      "Network design, installation and configuration, and CCTV installation that protects people and property.",
+    mode: 2,
+    seed: 2.9,
+  },
+  {
+    level: 4,
+    value: "Scalability",
+    name: "Software and backend",
+    summary:
+      "Custom software solutions and full-stack web platforms, built so they can grow.",
+    mode: 3,
+    seed: 6.1,
+  },
+  {
+    level: 5,
+    value: "Usability",
+    name: "Android and interfaces",
+    summary:
+      "Native and cross-platform Android apps and web interfaces that people can use without training.",
+    mode: 4,
+    seed: 3.4,
+  },
+] as const;
+
+export const consultation = {
+  label: "All five layers",
+  name: "IT and technical consultation",
+  summary:
+    "Independent advice across hardware, networks and software, before you commit to a build.",
+} as const;

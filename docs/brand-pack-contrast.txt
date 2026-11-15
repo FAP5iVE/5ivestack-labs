@@ -1,0 +1,12 @@
+Blue on white: 6.82:1
+Orange on white: 3.05:1
+Ink on white: 18.93:1
+White on blue: 6.82:1
+White on ink: 18.93:1
+Orange on ink: 6.21:1
+Blue on ink: 2.78:1
+Sky (LABS reverse) on ink: 7.35:1
+Orange on blue: 2.24:1
+White on orange: 3.05:1
+Ink on orange: 6.21:1
+Orange on paper: 2.82:1
