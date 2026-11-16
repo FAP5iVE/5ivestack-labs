@@ -1,6 +1,6 @@
 # Handoff: where the project stands
 
-Last updated: 15 Nov 2026. M0 to M2 and the first part of M3 (Systems walk) are written. The owner ran M2 locally and sent desktop screenshots (section 2); phones and the interactive behaviour are still unverified.
+Last updated: 15 Nov 2026. M0 to M2, the Systems walk and the Work section are written. **The site is live at https://5ivestack-labs.vercel.app** (noindex). The owner has checked it on a desktop and on a Samsung S20 Ultra (section 2). Other phones, an iPhone and the later features are unverified.
 Read this first, then `docs/DECISIONS.md`. Update this file at the end of every working session: status, remaining work, open questions, change log.
 
 Plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre
@@ -18,7 +18,7 @@ A bespoke, scroll-driven, phone-first website for 5iveStack Labs. Audience: loca
 | `pnpm install` | **NOT run** (M1 added `gsap`, `lenis`, `cmdk`; M2 added `three`, `@react-three/fiber`, `@types/three`). The build environment cannot install packages. No `pnpm-lock.yaml` exists yet |
 | `pnpm build`, `pnpm lint`, `pnpm typecheck` | **NOT run.** All TypeScript, CSS, GLSL and config in M0 to M2 is hand-written against the official `create-next-app` 16.4.6 template and is untested |
 | Visual check on desktop | **Partly done** from three owner screenshots (see below) |
-| Visual check on phone | **NOT done** |
+| Visual check on phone | **Partly done**: Samsung S20 Ultra, Chrome (see below). No iPhone, no other widths |
 
 So M0 to M3a are "code complete" and only partly verified (the owner has run M2 on a desktop). The first person to run it must follow section 3 and record the results in the change log.
 
@@ -31,7 +31,17 @@ Three screenshots of the home page at about 1820px wide, development mode:
 - Footer shows email, phone, WhatsApp and the Simple mode button (Off). Header shows the Systems/Layers link and `Menu  Ctrl K`.
 - One defect spotted and fixed: the orange signal bar poked out below the bottom layer (now exactly spans L1 to L5).
 
-NOT yet confirmed: browser console warnings or errors; `html[data-tier]` values; Lenis smoothing; opening, searching and closing the command palette; turning Simple mode on and off; layers separating on scroll; FPS step-down; the SVG-to-WebGL crossfade; the headline at other widths; and **every phone check**. The owner's priority is seamless display on any phone, so a phone screenshot set (home, menu open, Systems walk) at the S20 Ultra's width is the most useful next test.
+### Verified on the owner's Samsung S20 Ultra (Chrome, 15 Nov 2026, live site, build M3a)
+Five phone screenshots:
+- Home loads: logo and a Menu button fit the header with no overflow; the headline wraps to three lines; the description, orange button and link are readable and large enough to tap.
+- The WebGL stack runs on the phone (all five patterns, orange bus and nodes visible), so Tier 1 works on this device.
+- The orange progress bar under the header advances as the page scrolls.
+- The Menu opens as a full-screen sheet with the search box focused, a Close button and the groups Go to, Contact and Settings; an item highlights in ink on paper.
+- The Systems walk works: the dark viewport stays under the header while the steps scroll beneath it, the matching layer lifts and brightens (L5 while the L5 step is active, with the orange marker beside the step), and after the last step no layer is highlighted.
+- The footer lists email, phone and WhatsApp and the Simple mode button.
+- One thing to polish: with a layer lifted, the top slab sits very close to the viewport's top edge. The camera fit margin was widened from 7.3 to 7.8 to give it room (check on the next test).
+
+Still NOT confirmed on phones: other widths (320 to 430, tablet, landscape), an iPhone, Simple mode on a phone, Data Saver, step-down under load, and the new Work section. On desktop: browser console warnings or errors; `html[data-tier]` values; Lenis smoothing; opening, searching and closing the command palette; turning Simple mode on and off; layers separating on scroll; FPS step-down; the SVG-to-WebGL crossfade; the headline at other widths; and **every phone check**. The owner's priority is seamless display on any phone, so a phone screenshot set (home, menu open, Systems walk) at the S20 Ultra's width is the most useful next test.
 
 ## 3. First-run checklist (do this before starting M3)
 
@@ -96,6 +106,15 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 - [ ] Turn on a phone's battery saver or Data Saver and reload: the site should show the SVG (Save-Data or reduced motion).
 - [ ] In the layers list, every row reads cleanly at 320px (the value label above the layer name).
 
+### M3b checks (Work section and hero changes)
+- [ ] Hero: the headline reads "From sensor to screen, we build every layer." and fits at 320, 360 and 412px without awkward breaks. The orange button says "Email us" and opens a new email to fivestacklabs@gmail.com with the subject already filled in. "Message us on WhatsApp" is now the secondary link.
+- [ ] Work: two projects (SMS Malawi, Saviour Digital Solutions), each with a text column, a Role row, and four screenshots. The live links open the right sites in a new tab.
+- [ ] Phone: each project's screenshots form a swipeable strip (about 85% wide so the next image peeks in), the page does not scroll sideways, and "Swipe to see more screens." shows.
+- [ ] Desktop (lg and up): screenshots sit in a two-column grid beside the text.
+- [ ] Images are sharp but light (each about 30 to 85 KB). Lighthouse mobile performance does not drop noticeably.
+- [ ] Keyboard: each screenshot strip can be focused with Tab and scrolled with the arrow keys.
+- [ ] The Work link appears in the header (lg and up) and in the Menu; it scrolls below the sticky header.
+
 ### M3a checks (Systems walk)
 - [ ] Desktop: the `Systems` link scrolls to "Five layers, one team", the dark viewport stays beside the steps while you scroll, and as each step (L1 up to L5) crosses the middle of the screen the matching layer lifts and the others dim. The orange marker beside the active step appears.
 - [ ] After the last step ("IT and technical consultation") no layer is highlighted.
@@ -129,6 +148,9 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | `src/content/site.ts` | Company name, contact details (owner supplied), PLACEHOLDER description (D-30, D-31) |
 | `src/content/layers.ts` | The five layers: values, names, summaries (PLACEHOLDER), shader mode and seed (D-25) |
 | `src/components/hero/StackViewport.tsx` | Dark viewport used by hero and Systems walk: SVG, then lazily loaded WebGL scene (mounted only once near the screen), error boundary, visibility pausing; props `mode`, `focus`, `className` (D-28, D-36) |
+| `src/components/work/WorkSection.tsx` | Work section: text column plus real screenshots, swipe strip on phones (D-37) |
+| `src/content/work.ts` | Project facts and screenshot metadata, from the owner's own text. No invented outcomes |
+| `public/work/` | WebP screenshots (8 files, about 400 KB in total) for SMS Malawi and Saviour Digital Solutions |
 | `src/components/hero/SystemsWalk.tsx` | The Systems section: sticky viewport plus five steps L1 to L5; highlights the active layer (D-36) |
 | `src/components/hero/StackSvg.tsx` | Static SVG five-layer stack (Tier 0 and loading placeholder) |
 | `src/components/hero/StackScene.tsx` | R3F scene: procedural slabs, GLSL patterns, signal bus, FPS guard (D-27) |
@@ -157,7 +179,7 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | M0 foundation | Tokens, fonts, logo, checks | none | **Written, unverified** |
 | M1 scroll and shell | Lenis plus GSAP lifecycle, header, skip link, command palette with visible phone Menu button, Simple mode toggle, rendering-tier detection | `gsap`, `lenis`, `cmdk` (`@gsap/react` moved to M2, D-02) | **Written, unverified.** Anchors, keyboard, focus, reduced motion all work on a real phone (M1 checks above) |
 | M2 hero | **Written, unverified** (D-25 to D-32). Single canvas in the hero viewport (not Drei `View`, D-26), five procedural layers, trace shader (orange signal, sky and paper lines, no bloom), load sequence, SVG Tier 0, step-down, context-loss handling | `three`, `@react-three/fiber`, `@react-three/drei`, `@gsap/react` (+ `@types/three`) | Smooth on a mid-range Android, or the visitor lands on Tier 0 unharmed. Removes the M0 proof page |
-| M3 sections (3a Systems walk is written, D-36; Work, Lab and Principles wait for content) | Systems walk (CSS sticky plus ScrollTrigger progress), Work drawers, Lab, Principles, then two added Lab demos | `@react-three/rapier` (Lab only, lazy) | All content real; every drawer works by touch |
+| M3 sections (3a Systems walk and 3b Work are written, D-36 and D-37; Lab and Principles wait for content) | Systems walk (CSS sticky plus ScrollTrigger progress), Work drawers, Lab, Principles, then two added Lab demos | `@react-three/rapier` (Lab only, lazy) | All content real; every drawer works by touch |
 | M4 consultation | Step-by-step configurator, route handler, email, spam checks | `zod`, email provider SDK (default pick Resend: confirm limits and domain verification first) | A phone-submitted test request arrives in the inbox |
 | M5 hardening | Profiling, bundle analysis, image and font audit, accessibility review, SEO, Vercel deploy, real-device pass | `r3f-perf` (dev) | Budgets met on the throttled mobile profile |
 
@@ -175,15 +197,15 @@ Status: **Answered** (decision recorded), **Partly** (some information received)
 | Q-01 | Is the `sky` colour (`#6FA0FF`) approved as a third colour, restricted to text and lines on dark viewports? | **Answered 15 Nov 2026: yes** | Recorded in `globals.css` and D-05 |
 | Q-02 | Value-to-layer mapping | **Answered 15 Nov 2026: confirmed** | Owner asked to replace the buzzwords "Innovation" and "Creativity". Replaced with Scalability (L4) and Usability (L5), see D-25 and Q-11 |
 | Q-03 | Destination email, phone and WhatsApp | **Answered 15 Nov 2026** | fivestacklabs@gmail.com, +265 991 974 388 (phone and WhatsApp). Live in `src/content/site.ts`, the hero, footer and command palette (D-30). The M4 form will send to the same email |
-| Q-04 | Flagship projects (name, one line, owner's role, stack, real outcomes, 3 to 6 images, permission) | **Partly** | Candidates confirmed: SMS Malawi and the Saviour Digital Solutions site. Still need per project: one-line description, owner's role, stack, one or two real outcomes, 3 to 6 images, written permission to show. The owner has real images. More projects "will come later" |
+| Q-04 | Flagship projects (name, one line, owner's role, stack, real outcomes, 3 to 6 images, permission) | **Mostly answered 15 Nov 2026** | SMS Malawi and Saviour Digital Solutions are in the Work section with the owner's description, role (Developer), live links and four screenshots each. Saviour: built with HTML, CSS and JavaScript. Still open: the SMS Malawi stack, any real outcomes (numbers, client results), and a written OK that the client names and the school's photo shown in the screenshots may appear publicly. More projects "will come later" |
 | Q-05 | Details of the 2 to 3 Lab experiments | **Open** (owner will send later) | Default: Lab ships with the two added demos only |
 | Q-06 | Company text: description, one line per service, social links | **Partly** | Owner approved a PLACEHOLDER description (written, D-31). Still open: real text, and social links (none supplied) |
 | Q-07 | Analytics | **Open, default none** | None in v1. Adding any requires a privacy notice change first |
 | Q-08 | Privacy wording for the consultation form | **Partly** | Draft written from the primary text of the Malawi Data Protection Act 2024: `docs/privacy-notice-draft.md`. Needs the owner's facts (legal entity, address, retention periods, MACRA contact) and review by a Malawian lawyer. See A-08 |
-| Q-09 | Production domain and DNS access | **Open** | Owner will provide a Vercel URL soon. Default: Vercel preview URL |
+| Q-09 | Production domain and DNS access | **Partly answered 15 Nov 2026** | Live at https://5ivestack-labs.vercel.app (the site stays noindex). Still open: a custom domain, if wanted |
 | Q-10 | Test devices | **Answered 15 Nov 2026** | Samsung S20 Ultra (about 412px wide). Owner's priority: seamless on any phone size, because customers have different phones. Covered by the M2 width-sweep checklist (320 to 430, tablet, landscape) |
-| Q-11 | Confirm the new L4 and L5 words: **Scalability** and **Usability** (my picks, D-25) | **Open** | Proceeding with these. One-line change in `src/content/layers.ts` |
-| Q-12 | Hero headline "We build every layer, from circuit board to app." and the primary call to action (WhatsApp button) | **Open** | PLACEHOLDER. Owner to approve or reword |
+| Q-11 | Confirm the new L4 and L5 words: **Scalability** and **Usability** | **Answered 15 Nov 2026: confirmed** | Live in `src/content/layers.ts` |
+| Q-12 | Hero headline and primary call to action | **Partly answered 15 Nov 2026** | Owner asked for something catchier in the same direction, and for email to be the primary action. Now: "From sensor to screen, we build every layer." with an orange "Email us" button (subject prefilled) and WhatsApp as the secondary link. Still PLACEHOLDER until the owner approves. Alternatives are in D-38 |
 | Q-13 | Legal entity name, registration details and address | **Open** | Needed for the privacy notice (Part B section 1) |
 | Q-14 | Real device test results from the first-run checklists (M0, M1, M2) | **Open** | Blocks calling any milestone "done" |
 
@@ -222,3 +244,4 @@ Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (
 | 15 Nov 2026 | Claude | M2 (hero) written: home page, hero copy (placeholder), static SVG stack, lazily loaded procedural WebGL stack with five GLSL patterns, signal bus, scroll and pointer choreography, FPS step-down, error and context-loss fallbacks, five-layer text list, owner contact details in hero, footer and palette. Proof sheet moved to `/tokens`. Deps added: `three` 0.187.0, `@react-three/fiber` 9.8.2, `@types/three`. Owner answered Q-01, Q-02, Q-03, Q-10, partly Q-04 and Q-06. Layer labels L4 and L5 changed to Scalability and Usability (D-25). Dates in earlier entries corrected (several said 16 Nov by mistake). Nothing in M2 has been run. |
 | 15 Nov 2026 | Claude | Switzer supplied by the owner and bundled through `next/font/local` (D-33); interim `@font-face` removed. Licence read: private repository required, no subsetting. Privacy notice draft written from the primary text of the Malawi Data Protection Act 2024 (D-34). |
 | 15 Nov 2026 | Claude | Owner ran M2 and sent three desktop screenshots (D-35): renders correctly. Fixed the signal bar overshooting the bottom layer. Built M3a: Systems walk (sticky viewport, layer highlighting, `services` per layer), lazy mounting of each scene, `#systems` nav. Phone verification still outstanding. |
+| 15 Nov 2026 | Claude | Site went live on Vercel (owner). Phone screenshots from the S20 Ultra reviewed (D-35 addendum): home, menu sheet and Systems walk work. Built M3b: Work section from the owner's Resources.zip (8 screenshots converted to WebP, project facts from the owner's text), new headline, email as primary action with prefilled subject, `site.url` and `metadataBase`, wider camera fit margin (7.3 to 7.8), Work added to the nav. Q-04, Q-09, Q-11 and Q-12 updated. Deliverable zip now contains changed files only (owner's instruction). |

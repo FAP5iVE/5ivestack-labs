@@ -52,6 +52,7 @@ const jetbrains = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
   title: site.name,
   description: site.description,
   // Keep noindex until launch (M5) so placeholder copy is never indexed. Remove it then.

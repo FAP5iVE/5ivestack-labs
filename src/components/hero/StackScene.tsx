@@ -226,7 +226,7 @@ function Stack({ rig, tier, colors }: { rig: RefObject<Rig>; tier: 1 | 2; colors
 
     // Fit the orthographic camera to the container so the whole stack always shows.
     const cam = state.camera as THREE.OrthographicCamera;
-    const zoom = Math.min(state.size.width / 6.8, state.size.height / 7.3);
+    const zoom = Math.min(state.size.width / 6.8, state.size.height / 7.8);
     if (!fitted.current || Math.abs(cam.zoom - zoom) > 0.01) {
       cam.zoom = zoom;
       if (!fitted.current) cam.lookAt(0, 0, 0);

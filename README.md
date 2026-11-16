@@ -48,11 +48,13 @@ pnpm build          # production build
 ```
 src/app/        layout.tsx, page.tsx (home), tokens/page.tsx (developer-only proof sheet), globals.css (tokens), icons
 src/components/hero/   StackViewport, StackSvg, StackScene, SystemsWalk (five-layer hero and Systems walk)
+src/components/work/   WorkSection (selected work with real screenshots)
 src/components/shell/  Header, CommandPalette, ScrollEngine, Footer, SimpleModeToggle
 src/lib/        tier.ts (rendering tier, Simple mode), scroll.ts (Lenis instance and lock)
 src/content/    nav.ts, site.ts (contact and placeholder copy), layers.ts (the five layers)
 src/fonts/      Hubot Sans, Switzer and JetBrains Mono woff2 + licences (bundled by next/font/local)
 public/brand/   selected logo SVGs and 192/512 icons (full pack is NOT in the repo)
+public/work/    WebP screenshots for the Work section
 scripts/        check-contrast.mjs, check-banned.mjs
 docs/           HANDOFF.md, DECISIONS.md, brand pack notes
 ```

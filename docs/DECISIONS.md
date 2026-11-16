@@ -205,7 +205,8 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 
 ## D-35 First verification: owner's desktop screenshots (15 Nov 2026)
 **Record:** The owner ran M2 locally and sent three desktop screenshots (about 1820px wide, development mode). They show the home page rendering, the five-layer WebGL scene with all patterns (so the shader compiled), the orange progress bar, the footer with contact links and the Simple mode button, and the new fonts. One defect was visible (signal bar overshooting the bottom layer) and was fixed. Nothing was shown about phones, the console, the command palette, Simple mode switching or tier behaviour. Full list: HANDOFF section 2.
-**Status:** Partial verification. Phone checks remain the priority.
+**Phone addendum (S20 Ultra, Chrome, live site, 15 Nov 2026):** five phone screenshots show the home page, the WebGL stack on Tier 1, the progress bar, the full-screen Menu sheet and the Systems walk (sticky viewport, lifted active layer, orange step marker) all working. See HANDOFF section 2 for the list and what is still untested.
+**Status:** Partial verification. Other phone widths and an iPhone remain.
 
 ## D-36 Systems walk (15 Nov 2026, M3a)
 **Decision:** The "Five layers, one team" list became the Systems walk (`SystemsWalk.tsx`), anchored at `#systems` (header and palette link updated).
@@ -215,6 +216,23 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 - Layers now carry a `services` list taken from the owner's company scope (real service names, not placeholder copy).
 **Not done:** a rendering-tier-aware reduction of the walk on very low-end phones beyond what Tier 0/1 already do. If the second canvas hurts performance on the S20 Ultra, the fix is to reuse a single canvas.
 **Status:** Decided. Unverified.
+
+## D-37 Work section (15 Nov 2026, M3b)
+**Decision:** `WorkSection.tsx` shows two projects, SMS Malawi and Saviour Digital Solutions, from the owner's own description and screenshots (`Resources.zip`). Each project is a text column (name, summary, role, "Built with" only where the owner said what it was, live link) plus four screenshots. On phones the screenshots form a swipeable strip inside its own scroll box (85% wide so the next image peeks in, scroll snapping, keyboard-focusable, with a "Swipe to see more screens." hint), so the page never scrolls sideways; from `lg` up they sit in a two-column grid. No cards: hairline rules only; screenshots keep a thin border so light pages stay visible.
+- **Images:** 8 screenshots converted to WebP at 1400px wide, quality 78 (29 to 84 KB each, about 400 KB total), stored in `public/work/` and delivered through `next/image` (lazy, responsive `sizes`). Descriptive alt text was written for each from what is visible.
+- **Facts only:** no outcome numbers or client results because none were supplied. The SMS Malawi stack was not given, so it is omitted.
+- **Not done:** drawers or modal galleries (the plan's idea). With two projects and short text, inline rows are simpler and faster on phones. Revisit when there are more projects or long case studies.
+- **Privacy and permission:** the owner said they have permission to show these projects. The SMS screenshots show a real school's name and a photo of its building. The sign-in and application screens show empty fields only. HANDOFF Q-04 asks for a written OK from the client.
+**Status:** Decided. Unverified on devices.
+
+## D-38 Hero headline and primary action (15 Nov 2026)
+**Decision:** The owner asked for a catchier headline in the same direction and for email to be the primary action. The headline is now **"From sensor to screen, we build every layer."** It keeps the hardware-to-software message, opens with a rhythm (sensor, screen), and matches the five-layer stack. The orange primary button is **"Email us"**, opening `mailto:fivestacklabs@gmail.com` with a prefilled subject ("Enquiry from the 5iveStack Labs website"); "Message us on WhatsApp" is the secondary text link. The M4 consultation form will become the primary action.
+**Alternatives offered to the owner:** "Circuit board to cloud, built by one team."; "Hardware to app. One team."; "We build the whole stack, down to the silicon."; the previous "We build every layer, from circuit board to app."
+**Status:** Still a PLACEHOLDER until the owner approves (HANDOFF Q-12).
+
+## D-39 Live URL and metadataBase (15 Nov 2026)
+**Decision:** The owner deployed the site to Vercel at https://5ivestack-labs.vercel.app. `site.url` holds it and `layout.tsx` sets `metadataBase` from it so future Open Graph and canonical URLs resolve. The site stays `noindex` (D-32) until launch. Replace `site.url` when a custom domain is attached.
+**Status:** Decided.
 
 ---
 

@@ -1,5 +1,6 @@
 import { StackViewport } from "@/components/hero/StackViewport";
 import { SystemsWalk } from "@/components/hero/SystemsWalk";
+import { WorkSection } from "@/components/work/WorkSection";
 import { site } from "@/content/site";
 
 export default function Home() {
@@ -12,25 +13,25 @@ export default function Home() {
               id="hero-title"
               className="font-display font-wide text-display font-bold"
             >
-              We build every layer, from circuit board to app.
+              From sensor to screen, we build every layer.
             </h1>
             <p className="mt-6 max-w-[var(--measure)] text-lead text-ink-muted">
               {site.description}
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-6">
               <a
+                href={site.emailEnquiryHref}
+                className="inline-flex min-h-11 items-center rounded-control bg-orange px-6 text-body font-medium text-ink"
+              >
+                Email us
+              </a>
+              <a
                 href={site.whatsappHref}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-11 items-center rounded-control bg-orange px-6 text-body font-medium text-ink"
-              >
-                Message us on WhatsApp
-              </a>
-              <a
-                href={site.emailHref}
                 className="inline-flex min-h-11 items-center text-body text-cobalt underline underline-offset-4"
               >
-                Email us
+                Message us on WhatsApp
               </a>
             </div>
           </div>
@@ -41,6 +42,7 @@ export default function Home() {
       </section>
 
       <SystemsWalk />
+      <WorkSection />
     </main>
   );
 }
