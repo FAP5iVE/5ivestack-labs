@@ -49,9 +49,12 @@ pnpm build          # production build
 src/app/        layout.tsx, page.tsx (home), tokens/page.tsx (developer-only proof sheet), globals.css (tokens), icons
 src/components/hero/   StackViewport, StackSvg, StackScene, SystemsWalk (five-layer hero and Systems walk)
 src/components/work/   WorkSection (selected work with real screenshots)
+src/components/consult/   ConsultSection, ConsultForm (consultation form, switched off until activated)
+src/app/api/consult/   route.ts (sends the request email)
+src/app/privacy/   page.tsx (Privacy Notice)
 src/components/shell/  Header, CommandPalette, ScrollEngine, Footer, SimpleModeToggle
-src/lib/        tier.ts (rendering tier, Simple mode), scroll.ts (Lenis instance and lock)
-src/content/    nav.ts, site.ts (contact and placeholder copy), layers.ts (the five layers)
+src/lib/        tier.ts (rendering tier, Simple mode), scroll.ts (Lenis instance and lock), consult.ts and consult-config.ts (form validation and on/off switch)
+src/content/    nav.ts, site.ts (contact and placeholder copy), layers.ts (the five layers), work.ts (projects), privacy.ts (facts the notice needs)
 src/fonts/      Hubot Sans, Switzer and JetBrains Mono woff2 + licences (bundled by next/font/local)
 public/brand/   selected logo SVGs and 192/512 icons (full pack is NOT in the repo)
 public/work/    WebP screenshots for the Work section
@@ -67,7 +70,7 @@ Light page (`paper`) with dark instrument viewports (`ink`) used only for live W
 
 ## Environment
 
-No environment variables are needed yet. Milestone M4 adds the email provider key and destination address; they live in Vercel environment variables and a local `.env.local`, never in the repo. A `.env.example` will be added then.
+The consultation form uses four variables, listed with explanations in `.env.example`: `CONSULT_ENABLED`, `RESEND_API_KEY`, `CONSULT_TO`, `CONSULT_FROM`. Put them in Vercel (Project Settings, Environment Variables) and in a local `.env.local`; never commit real values. The form stays hidden until they are set, the privacy notice is marked reviewed, and the site is redeployed. Steps: `docs/HANDOFF.md` section 5a.
 
 ## Deployment
 

@@ -234,6 +234,23 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 **Decision:** The owner deployed the site to Vercel at https://5ivestack-labs.vercel.app. `site.url` holds it and `layout.tsx` sets `metadataBase` from it so future Open Graph and canonical URLs resolve. The site stays `noindex` (D-32) until launch. Replace `site.url` when a custom domain is attached.
 **Status:** Decided.
 
+## D-40 Consultation form (15 Nov 2026, M4)
+**Decision:** A three-step form in the "Start a consultation" section (`#consult`): (1) what you need (six services, multiple choice), (2) about you (organisation type, name, email, optional phone), (3) your message, the short privacy notice and a required, unticked consent checkbox. One question group per screen suits phones. Controls are at least 44px, text is 16px or larger (no iOS zoom), errors are stated in words ("Problem: ..."), and focus moves to each step's heading. The steps are a real sequence, so "Step 1 of 3" is used. The success screen repeats the visitor's email and offers email and WhatsApp as a fallback. The hero's primary button stays "Email us" (D-38); the form is the structured alternative.
+**Rejected:** a single long form (poor on phones); a CAPTCHA (friction, third-party tracking); sending the visitor a confirmation email (more data and a spam-relay risk).
+**Status:** Decided. Unverified on devices.
+
+## D-41 Sending, spam defence and the on/off switch (15 Nov 2026, M4)
+**Decision:** `POST /api/consult` sends one plain-text email through the Resend REST API (`POST https://api.resend.com/emails`, Bearer key, JSON body; `from`, `to`, `subject`, `text`, `reply_to`). I verified the endpoint and fields against Resend's documentation on 15 Nov 2026. No SDK is installed (no new dependency). The email carries a consent timestamp and the privacy notice date, and Reply-To is the visitor's address. Nothing is stored in a database, and the visitor's details are never logged (only the provider's status code on failure).
+- **Defences:** same-origin check, hidden honeypot field (silently accepted, nothing sent), three-second time trap, authoritative server-side validation (`src/lib/consult.ts`, tested with Node: dedupes services, strips control characters and line breaks, rejects bad email, phone and message, requires consent), and a light in-memory rate limit of 5 requests per IP per hour (per serverless instance, so it only blunts casual abuse; add a shared store if spam appears).
+- **Switch:** `consultEnabled()` is true only when `CONSULT_ENABLED=true`, `RESEND_API_KEY` is set AND `privacy.reviewed` is true. Until then the section shows plain contact links and the API returns 503. This enforces the rule that the form must not go live without a reviewed notice. The home page is built statically, so redeploy after changing the environment.
+- **Provider facts to remember:** the test sender `onboarding@resend.dev` only delivers to the email the Resend account was created with (so create it with fivestacklabs@gmail.com, or verify a domain); the free plan was reported as 3,000 emails per month with a 100 per day cap (secondary source; confirm).
+**Rejected:** the Resend SDK (an extra dependency for one call), SMTP through Gmail (app passwords, fragile), storing requests in a database (more personal data to protect).
+**Status:** Decided. Unverified end to end.
+
+## D-42 Privacy Notice page (15 Nov 2026, M4)
+**Decision:** `/privacy` renders the notice from `docs/privacy-notice-draft.md` Part B, with the Malawi Data Protection Act, 2024 section references checked against the Act's published text. Unknown facts live in `src/content/privacy.ts`; each shows as "[... to be confirmed]" and a DRAFT banner lists them until none remain and `reviewed` is true. The Resend email provider is now named. The page is `noindex` like the rest of the site and linked from the footer and from the form. The form's short notice reads its entity name and retention wording from the same facts, so the two cannot disagree.
+**Status:** Draft until reviewed by a Malawian lawyer (HANDOFF Q-08, A-08).
+
 ---
 
 ## Carried-forward decisions from the plan (still in force)
@@ -241,7 +258,7 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 - Hero geometry is procedural; no `.glb` in v1; no bloom or glow. (The shared-canvas-via-`View` idea is deferred, D-26.)
 - Three rendering tiers (SVG, light WebGL, full WebGL) with runtime step-down and a visible Simple mode.
 - No ScrollTrigger pinning on phones; CSS sticky plus ScrollTrigger progress.
-- No database; consultation requests go out as email from a route handler.
+- No database; consultation requests go out as email from a route handler (built, D-40 and D-41).
 - No telemetry in v1 unless a real feed exists.
 - Five layers L1 to L5 from hardware to software, labelled with the five values; the mapping was confirmed by the owner on 15 Nov 2026 (labels for L4 and L5 changed, D-25).
 - English only; Vercel; npm and pnpm available to the owner locally.

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { site } from "@/content/site";
 import { SimpleModeToggle } from "./SimpleModeToggle";
 
@@ -30,6 +31,11 @@ export function Footer() {
               >
                 WhatsApp
               </a>
+            </li>
+            <li>
+              <Link href="/privacy" className={linkClass}>
+                Privacy Notice
+              </Link>
             </li>
           </ul>
         </div>

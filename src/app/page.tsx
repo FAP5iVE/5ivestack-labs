@@ -1,3 +1,4 @@
+import { ConsultSection } from "@/components/consult/ConsultSection";
 import { StackViewport } from "@/components/hero/StackViewport";
 import { SystemsWalk } from "@/components/hero/SystemsWalk";
 import { WorkSection } from "@/components/work/WorkSection";
@@ -43,6 +44,7 @@ export default function Home() {
 
       <SystemsWalk />
       <WorkSection />
+      <ConsultSection />
     </main>
   );
 }

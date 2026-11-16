@@ -1,6 +1,6 @@
 # Handoff: where the project stands
 
-Last updated: 15 Nov 2026. M0 to M2, the Systems walk and the Work section are written. **The site is live at https://5ivestack-labs.vercel.app** (noindex). The owner has checked it on a desktop and on a Samsung S20 Ultra (section 2). Other phones, an iPhone and the later features are unverified.
+Last updated: 15 Nov 2026. M0 to M2, the Systems walk, the Work section and the consultation form (M4, switched off) are written. **The site is live at https://5ivestack-labs.vercel.app** (noindex). The owner has checked it on a desktop and on a Samsung S20 Ultra (section 2). Other phones, an iPhone and the later features are unverified.
 Read this first, then `docs/DECISIONS.md`. Update this file at the end of every working session: status, remaining work, open questions, change log.
 
 Plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre
@@ -106,6 +106,16 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 - [ ] Turn on a phone's battery saver or Data Saver and reload: the site should show the SVG (Save-Data or reduced motion).
 - [ ] In the layers list, every row reads cleanly at 320px (the value label above the layer name).
 
+### M4 checks (consultation form; only after activation, section 5a)
+- [ ] The "Start a consultation" section shows a three-step form (What do you need, About you, Your message). Before activation it shows contact links instead.
+- [ ] Phone (320 to 430px): each step fits without sideways scrolling; options are at least 44px tall; typing in a field does not zoom the page; Next and Back work; the on-screen keyboard does not hide the Send button when you scroll.
+- [ ] Validation: leaving a step empty shows a plain "Problem: ..." message under the field (not colour alone) and keeps you on that step; a screen reader announces it.
+- [ ] Step 3 shows the short privacy notice and the unticked consent checkbox; Send is blocked until it is ticked; the Privacy Notice link opens `/privacy` in a new tab.
+- [ ] A successful submit shows "Thank you" and an email arrives at CONSULT_TO within a minute with name, email, phone, organisation type, services, message, a consent timestamp, and Reply-To set to the visitor.
+- [ ] Spam checks: submitting in under 3 seconds (use a script or the browser console) is rejected; a filled hidden field is silently accepted but sends nothing; more than 5 submissions from one connection in an hour are refused.
+- [ ] Turn the Resend key off (or set it wrong): the form shows an error with a direct email link, and no details are lost from the form.
+- [ ] `/privacy` reads cleanly on a phone, has no DRAFT banner, and every `[... to be confirmed]` is gone.
+
 ### M3b checks (Work section and hero changes)
 - [ ] Hero: the headline reads "From sensor to screen, we build every layer." and fits at 320, 360 and 412px without awkward breaks. The orange button says "Email us" and opens a new email to fivestacklabs@gmail.com with the subject already filled in. "Message us on WhatsApp" is now the secondary link.
 - [ ] Work: two projects (SMS Malawi, Saviour Digital Solutions), each with a text column, a Role row, and four screenshots. The live links open the right sites in a new tab.
@@ -154,6 +164,11 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | `src/components/hero/SystemsWalk.tsx` | The Systems section: sticky viewport plus five steps L1 to L5; highlights the active layer (D-36) |
 | `src/components/hero/StackSvg.tsx` | Static SVG five-layer stack (Tier 0 and loading placeholder) |
 | `src/components/hero/StackScene.tsx` | R3F scene: procedural slabs, GLSL patterns, signal bus, FPS guard (D-27) |
+| `src/components/consult/ConsultSection.tsx`, `ConsultForm.tsx` | The consultation section (gated) and the three-step form (D-40) |
+| `src/app/api/consult/route.ts` | POST endpoint: same-origin check, rate limit, honeypot, time trap, validation, one plain-text email via the Resend REST API (D-41) |
+| `src/lib/consult.ts`, `src/lib/consult-config.ts` | Shared validation and options; the server-side on/off switch |
+| `src/app/privacy/page.tsx`, `src/content/privacy.ts` | The Privacy Notice page and the facts it depends on (D-42) |
+| `.env.example` | The environment variables and what they do |
 | `docs/privacy-notice-draft.md` | Draft privacy notice, form notice and owner compliance map. **Needs legal review** (Q-08) |
 | `src/components/shell/ScrollEngine.tsx` | Renders nothing. Writes `--page-progress`; starts GSAP ScrollTrigger and (fine-pointer, Tier 1+) Lenis, lazily |
 | `src/components/shell/Header.tsx` | Sticky header, logo, links from `lg`, orange progress bar |
@@ -170,7 +185,7 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 - **A-04 Verify the Tailwind spacing-scale enforcement option** (D-09), or keep the scanner as the control.
 - **A-05 Create the Vercel project** (Git integration, Node 22). Production domain: see Q-09.
 - **A-07 Keep the Git repository PRIVATE** and do not publish the font files (D-33). Anyone outside the company who needs to work on the code must download Switzer from Fontshare themselves and add it to `src/fonts/`.
-- **A-08 Privacy notice:** owner to complete the items in `docs/privacy-notice-draft.md` Part A3, then have a Malawian lawyer review it. Build `/privacy` and the form notice in M4.
+- **A-08 Privacy notice:** `/privacy` is built and shows a DRAFT banner listing the facts still missing. Owner: fill `src/content/privacy.ts` (items in `docs/privacy-notice-draft.md` Part A3), then have a Malawian lawyer review the page, then set `reviewed: true`.
 - **A-06 Version control:** the project is not yet in a Git repository. Initialise, make a first commit after A-02 passes, and add a CI step running `pnpm check`.
 
 ### Milestones (details in the plan)
@@ -180,13 +195,22 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | M1 scroll and shell | Lenis plus GSAP lifecycle, header, skip link, command palette with visible phone Menu button, Simple mode toggle, rendering-tier detection | `gsap`, `lenis`, `cmdk` (`@gsap/react` moved to M2, D-02) | **Written, unverified.** Anchors, keyboard, focus, reduced motion all work on a real phone (M1 checks above) |
 | M2 hero | **Written, unverified** (D-25 to D-32). Single canvas in the hero viewport (not Drei `View`, D-26), five procedural layers, trace shader (orange signal, sky and paper lines, no bloom), load sequence, SVG Tier 0, step-down, context-loss handling | `three`, `@react-three/fiber`, `@react-three/drei`, `@gsap/react` (+ `@types/three`) | Smooth on a mid-range Android, or the visitor lands on Tier 0 unharmed. Removes the M0 proof page |
 | M3 sections (3a Systems walk and 3b Work are written, D-36 and D-37; Lab and Principles wait for content) | Systems walk (CSS sticky plus ScrollTrigger progress), Work drawers, Lab, Principles, then two added Lab demos | `@react-three/rapier` (Lab only, lazy) | All content real; every drawer works by touch |
-| M4 consultation | Step-by-step configurator, route handler, email, spam checks | `zod`, email provider SDK (default pick Resend: confirm limits and domain verification first) | A phone-submitted test request arrives in the inbox |
+| M4 consultation (**written, switched off until activated, see section 5a**) | Step-by-step configurator, route handler, email, spam checks | `zod`, email provider SDK (default pick Resend: confirm limits and domain verification first) | A phone-submitted test request arrives in the inbox |
 | M5 hardening | Profiling, bundle analysis, image and font audit, accessibility review, SEO, Vercel deploy, real-device pass | `r3f-perf` (dev) | Budgets met on the throttled mobile profile |
 
 Definition of done for every milestone: works at 360px; keyboard works; reduced motion works; Lighthouse mobile passes the budgets; `pnpm check` is clean; one real-phone test recorded in the change log.
 
 ### Budgets (proposals, tune after bundle analysis)
 LCP under 2.5s, INP under 200ms, CLS under 0.1 on a throttled mobile profile. First-load JavaScript around 170 KB gzipped excluding the lazy 3D chunk. Images AVIF or WebP via `next/image` with explicit sizes.
+
+## 5a. Activating the consultation form (M4)
+The form is built but **invisible until all three switches are on** (D-41). Visitors currently see plain contact links in its place. To go live, in this order:
+1. **Privacy facts.** Fill every `null` in `src/content/privacy.ts` (legal entity, address, last updated date, retention periods, MACRA contact). Open `/privacy`: the DRAFT banner lists what is still missing and disappears when none are. Have a Malawian lawyer review the page.
+2. **Mark reviewed.** Set `reviewed: true` in `src/content/privacy.ts` only after that review.
+3. **Resend account.** Create a free account at resend.com **using fivestacklabs@gmail.com** (the test sender `onboarding@resend.dev` only delivers to the account's own email address). Create an API key with sending access. The free plan was reported as 3,000 emails per month with a daily cap of 100 (a secondary source; confirm on Resend's pricing page). To send to any other address later, verify a domain in Resend.
+4. **Vercel environment variables** (Project Settings, Environment Variables, Production): `CONSULT_ENABLED=true`, `RESEND_API_KEY=<the key>`, `CONSULT_TO=fivestacklabs@gmail.com`, `CONSULT_FROM=5iveStack Labs <onboarding@resend.dev>`. Never commit real values.
+5. **Redeploy** (the page is built statically, so the form only appears on the next build).
+6. **Test from a phone:** submit a request; it must arrive in the inbox with Reply-To set to the visitor's address. Then check the M4 list in section 3.
 
 ## 6. Questions (Q-xx)
 
@@ -196,17 +220,17 @@ Status: **Answered** (decision recorded), **Partly** (some information received)
 |---|---|---|---|
 | Q-01 | Is the `sky` colour (`#6FA0FF`) approved as a third colour, restricted to text and lines on dark viewports? | **Answered 15 Nov 2026: yes** | Recorded in `globals.css` and D-05 |
 | Q-02 | Value-to-layer mapping | **Answered 15 Nov 2026: confirmed** | Owner asked to replace the buzzwords "Innovation" and "Creativity". Replaced with Scalability (L4) and Usability (L5), see D-25 and Q-11 |
-| Q-03 | Destination email, phone and WhatsApp | **Answered 15 Nov 2026** | fivestacklabs@gmail.com, +265 991 974 388 (phone and WhatsApp). Live in `src/content/site.ts`, the hero, footer and command palette (D-30). The M4 form will send to the same email |
+| Q-03 | Destination email, phone and WhatsApp | **Answered 15 Nov 2026** | fivestacklabs@gmail.com, +265 991 974 388. Live in the hero (email is the primary button), footer, command palette, and the consultation form's destination (`CONSULT_TO`). Needs a Resend account created with this same address (section 5a) |
 | Q-04 | Flagship projects (name, one line, owner's role, stack, real outcomes, 3 to 6 images, permission) | **Mostly answered 15 Nov 2026** | SMS Malawi and Saviour Digital Solutions are in the Work section with the owner's description, role (Developer), live links and four screenshots each. Saviour: built with HTML, CSS and JavaScript. Still open: the SMS Malawi stack, any real outcomes (numbers, client results), and a written OK that the client names and the school's photo shown in the screenshots may appear publicly. More projects "will come later" |
 | Q-05 | Details of the 2 to 3 Lab experiments | **Open** (owner will send later) | Default: Lab ships with the two added demos only |
 | Q-06 | Company text: description, one line per service, social links | **Partly** | Owner approved a PLACEHOLDER description (written, D-31). Still open: real text, and social links (none supplied) |
 | Q-07 | Analytics | **Open, default none** | None in v1. Adding any requires a privacy notice change first |
-| Q-08 | Privacy wording for the consultation form | **Partly** | Draft written from the primary text of the Malawi Data Protection Act 2024: `docs/privacy-notice-draft.md`. Needs the owner's facts (legal entity, address, retention periods, MACRA contact) and review by a Malawian lawyer. See A-08 |
+| Q-08 | Privacy wording for the consultation form | **Partly** | `/privacy` page and the form's short notice are built from the draft (D-42). The form stays off until the owner fills the missing facts and a Malawian lawyer reviews it (section 5a) |
 | Q-09 | Production domain and DNS access | **Partly answered 15 Nov 2026** | Live at https://5ivestack-labs.vercel.app (the site stays noindex). Still open: a custom domain, if wanted |
 | Q-10 | Test devices | **Answered 15 Nov 2026** | Samsung S20 Ultra (about 412px wide). Owner's priority: seamless on any phone size, because customers have different phones. Covered by the M2 width-sweep checklist (320 to 430, tablet, landscape) |
 | Q-11 | Confirm the new L4 and L5 words: **Scalability** and **Usability** | **Answered 15 Nov 2026: confirmed** | Live in `src/content/layers.ts` |
 | Q-12 | Hero headline and primary call to action | **Partly answered 15 Nov 2026** | Owner asked for something catchier in the same direction, and for email to be the primary action. Now: "From sensor to screen, we build every layer." with an orange "Email us" button (subject prefilled) and WhatsApp as the secondary link. Still PLACEHOLDER until the owner approves. Alternatives are in D-38 |
-| Q-13 | Legal entity name, registration details and address | **Open** | Needed for the privacy notice (Part B section 1) |
+| Q-13 | Legal entity name, registration details and address | **Open** | Needed for `/privacy` (fill `src/content/privacy.ts`). Also needed: retention periods, MACRA complaint contact, the publication date |
 | Q-14 | Real device test results from the first-run checklists (M0, M1, M2) | **Open** | Blocks calling any milestone "done" |
 
 Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (light page with dark viewports), English only, Vercel hosting, owner can run npm and pnpm locally, logo and icon files supplied (the pack also has SVG variants without a background, usable if the reverse horizontal's own background is a problem), Switzer font supplied.
@@ -245,3 +269,4 @@ Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (
 | 15 Nov 2026 | Claude | Switzer supplied by the owner and bundled through `next/font/local` (D-33); interim `@font-face` removed. Licence read: private repository required, no subsetting. Privacy notice draft written from the primary text of the Malawi Data Protection Act 2024 (D-34). |
 | 15 Nov 2026 | Claude | Owner ran M2 and sent three desktop screenshots (D-35): renders correctly. Fixed the signal bar overshooting the bottom layer. Built M3a: Systems walk (sticky viewport, layer highlighting, `services` per layer), lazy mounting of each scene, `#systems` nav. Phone verification still outstanding. |
 | 15 Nov 2026 | Claude | Site went live on Vercel (owner). Phone screenshots from the S20 Ultra reviewed (D-35 addendum): home, menu sheet and Systems walk work. Built M3b: Work section from the owner's Resources.zip (8 screenshots converted to WebP, project facts from the owner's text), new headline, email as primary action with prefilled subject, `site.url` and `metadataBase`, wider camera fit margin (7.3 to 7.8), Work added to the nav. Q-04, Q-09, Q-11 and Q-12 updated. Deliverable zip now contains changed files only (owner's instruction). |
+| 15 Nov 2026 | Claude | Built M4: three-step consultation form, `/api/consult` route (Resend REST API, no new packages), `/privacy` page with DRAFT banner, `.env.example`, footer Privacy link, Consult in the nav. The form is switched off until three conditions are met (D-41). Validation logic tested with Node (dedupe, sanitising, error messages). Nothing else in M4 has been run. |
