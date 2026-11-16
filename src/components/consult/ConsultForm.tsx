@@ -286,12 +286,13 @@ export function ConsultForm() {
 
           <div className="mt-8">
             <label htmlFor="consult-name" className="text-body font-medium">
-              Your name
+              Your name <span className="font-normal text-ink-muted">(required)</span>
             </label>
             <input
               id="consult-name"
               type="text"
               autoComplete="name"
+              required
               maxLength={100}
               value={values.name}
               onChange={(e) => set("name", e.target.value)}
@@ -304,13 +305,14 @@ export function ConsultForm() {
 
           <div className="mt-6">
             <label htmlFor="consult-email" className="text-body font-medium">
-              Email address
+              Email address <span className="font-normal text-ink-muted">(required)</span>
             </label>
             <input
               id="consult-email"
               type="email"
               inputMode="email"
               autoComplete="email"
+              required
               maxLength={254}
               value={values.email}
               onChange={(e) => set("email", e.target.value)}
@@ -345,11 +347,13 @@ export function ConsultForm() {
       {step === 3 ? (
         <div className="mt-6">
           <label htmlFor="consult-message" className="text-body font-medium">
-            Tell us about your project or problem
+            Tell us about your project or problem{" "}
+            <span className="font-normal text-ink-muted">(required)</span>
           </label>
           <textarea
             id="consult-message"
             rows={6}
+            required
             maxLength={2000}
             value={values.message}
             onChange={(e) => set("message", e.target.value)}

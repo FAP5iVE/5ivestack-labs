@@ -1,6 +1,6 @@
 # Handoff: where the project stands
 
-Last updated: 15 Nov 2026. M0 to M2, the Systems walk, the Work section and the consultation form (M4, switched off) are written. **The site is live at https://5ivestack-labs.vercel.app** (noindex). The owner has checked it on a desktop and on a Samsung S20 Ultra (section 2). Other phones, an iPhone and the later features are unverified.
+Last updated: 16 Nov 2026. M0 to M4 are written; the privacy notice is marked reviewed; launch-readiness work (M5a: SEO, security headers, accessibility review) is written. The consultation form needs only the Resend key and a redeploy (section 5a). Two privacy facts and a few device tests are still open. **The site is live at https://5ivestack-labs.vercel.app** (noindex). The owner has checked it on a desktop and on a Samsung S20 Ultra (section 2). Other phones, an iPhone and the later features are unverified.
 Read this first, then `docs/DECISIONS.md`. Update this file at the end of every working session: status, remaining work, open questions, change log.
 
 Plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre
@@ -106,6 +106,13 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 - [ ] Turn on a phone's battery saver or Data Saver and reload: the site should show the SVG (Save-Data or reduced motion).
 - [ ] In the layers list, every row reads cleanly at 320px (the value label above the layer name).
 
+### M5a checks (launch readiness)
+- [ ] View source on the live site: `<title>` is "5iveStack Labs | Software, embedded systems, networks and CCTV"; there are Open Graph and Twitter tags; there is one JSON-LD script with the organisation, email and phone; the canonical link is `/` on the home page and `/privacy` on the Privacy Notice. While `SITE_INDEXABLE` is not true, `robots` says noindex.
+- [ ] `/robots.txt` disallows everything now, and allows `/` (not `/api/` or `/tokens`) after launch. `/sitemap.xml` is empty now and lists two pages after launch.
+- [ ] Opening `/opengraph-image.png` shows the logo on a dark 1200 by 630 image.
+- [ ] Response headers (devtools, Network, any request) include `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`. Nothing on the site breaks (fonts, images, WhatsApp and email links, the form).
+- [ ] Screen reader: the hero and Systems graphics are skipped; headings read in order; the form announces required fields and errors.
+
 ### M4 checks (consultation form; only after activation, section 5a)
 - [ ] The "Start a consultation" section shows a three-step form (What do you need, About you, Your message). Before activation it shows contact links instead.
 - [ ] Phone (320 to 430px): each step fits without sideways scrolling; options are at least 44px tall; typing in a field does not zoom the page; Next and Back work; the on-screen keyboard does not hide the Send button when you scroll.
@@ -168,7 +175,10 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | `src/app/api/consult/route.ts` | POST endpoint: same-origin check, rate limit, honeypot, time trap, validation, one plain-text email via the Resend REST API (D-41) |
 | `src/lib/consult.ts`, `src/lib/consult-config.ts` | Shared validation and options; the server-side on/off switch |
 | `src/app/privacy/page.tsx`, `src/content/privacy.ts` | The Privacy Notice page and the facts it depends on (D-42) |
-| `.env.example` | The environment variables and what they do |
+| `.env.example`, `.env.local` | The environment variables and what they do; `.env.local` is the owner's own copy to fill in (never committed) |
+| `src/lib/seo.ts`, `src/app/robots.ts`, `src/app/sitemap.ts` | Launch switch for search engines (D-44) |
+| `src/app/opengraph-image.png`, `twitter-image.png` (+ `.alt.txt`) | Social preview image (logo on ink, 1200 by 630) |
+| `docs/accessibility-review.md` | Accessibility review: findings, fixes, open items (D-46) |
 | `docs/privacy-notice-draft.md` | Draft privacy notice, form notice and owner compliance map. **Needs legal review** (Q-08) |
 | `src/components/shell/ScrollEngine.tsx` | Renders nothing. Writes `--page-progress`; starts GSAP ScrollTrigger and (fine-pointer, Tier 1+) Lenis, lazily |
 | `src/components/shell/Header.tsx` | Sticky header, logo, links from `lg`, orange progress bar |
@@ -205,12 +215,21 @@ LCP under 2.5s, INP under 200ms, CLS under 0.1 on a throttled mobile profile. Fi
 
 ## 5a. Activating the consultation form (M4)
 The form is built but **invisible until all three switches are on** (D-41). Visitors currently see plain contact links in its place. To go live, in this order:
-1. **Privacy facts.** Fill every `null` in `src/content/privacy.ts` (legal entity, address, last updated date, retention periods, MACRA contact). Open `/privacy`: the DRAFT banner lists what is still missing and disappears when none are. Have a Malawian lawyer review the page.
-2. **Mark reviewed.** Set `reviewed: true` in `src/content/privacy.ts` only after that review.
+1. **Privacy facts. Mostly done 16 Nov 2026.** Filled: last updated date, address, retention for enquiries (1 year), MACRA contact. **Still `null`: legal entity name, retention for server logs, retention for contract records.** Until they are filled `/privacy` shows a DRAFT banner and "[... to be confirmed]" in those three places, even though the form can already be switched on. Fill them before the form goes public.
+2. **Reviewed. Done.** `reviewed: true` is set (the owner confirmed on 16 Nov 2026 that a Malawian lawyer reviewed the notice the night before). Keep the lawyer's written confirmation with the company records. If the text of `/privacy` changes after review, ask the lawyer to re-check the changed parts and update the date.
 3. **Resend account.** Create a free account at resend.com **using fivestacklabs@gmail.com** (the test sender `onboarding@resend.dev` only delivers to the account's own email address). Create an API key with sending access. The free plan was reported as 3,000 emails per month with a daily cap of 100 (a secondary source; confirm on Resend's pricing page). To send to any other address later, verify a domain in Resend.
-4. **Vercel environment variables** (Project Settings, Environment Variables, Production): `CONSULT_ENABLED=true`, `RESEND_API_KEY=<the key>`, `CONSULT_TO=fivestacklabs@gmail.com`, `CONSULT_FROM=5iveStack Labs <onboarding@resend.dev>`. Never commit real values.
+4. **Local test first:** the owner's `.env.local` (not committed) already has the right names. Paste the key after `RESEND_API_KEY=`, run `pnpm dev`, and the form appears in the Consult section. **Vercel environment variables** (Project Settings, Environment Variables, Production): `CONSULT_ENABLED=true`, `RESEND_API_KEY=<the key>`, `CONSULT_TO=fivestacklabs@gmail.com`, `CONSULT_FROM=5iveStack Labs <onboarding@resend.dev>`. Never commit real values.
 5. **Redeploy** (the page is built statically, so the form only appears on the next build).
 6. **Test from a phone:** submit a request; it must arrive in the inbox with Reply-To set to the visitor's address. Then check the M4 list in section 3.
+
+## 5b. Launching to search engines (M5a)
+The site is public at https://5ivestack-labs.vercel.app but tells search engines to ignore it (D-44). To launch:
+1. Finish or approve the PLACEHOLDER copy (hero headline, site description, layer summaries) and remove `/tokens` (delete `src/app/tokens/`).
+2. Fill the remaining privacy facts (section 5a step 1) and activate the form.
+3. If you attach a custom domain, set it in `site.url` (`src/content/site.ts`).
+4. Set `SITE_INDEXABLE=true` in Vercel (Production) and redeploy. Pages become indexable, `/robots.txt` allows crawling (except `/api/` and `/tokens`), and `/sitemap.xml` lists the home page and the Privacy Notice.
+5. Add the site to Google Search Console and submit the sitemap. Check the social preview image by pasting the URL into a link previewer.
+6. Run the accessibility device tests in `docs/accessibility-review.md` and a Lighthouse mobile run; record the results in the change log.
 
 ## 6. Questions (Q-xx)
 
@@ -225,13 +244,15 @@ Status: **Answered** (decision recorded), **Partly** (some information received)
 | Q-05 | Details of the 2 to 3 Lab experiments | **Open** (owner will send later) | Default: Lab ships with the two added demos only |
 | Q-06 | Company text: description, one line per service, social links | **Partly** | Owner approved a PLACEHOLDER description (written, D-31). Still open: real text, and social links (none supplied) |
 | Q-07 | Analytics | **Open, default none** | None in v1. Adding any requires a privacy notice change first |
-| Q-08 | Privacy wording for the consultation form | **Partly** | `/privacy` page and the form's short notice are built from the draft (D-42). The form stays off until the owner fills the missing facts and a Malawian lawyer reviews it (section 5a) |
+| Q-08 | Privacy wording for the consultation form | **Answered 16 Nov 2026: reviewed** | The owner confirmed a Malawian lawyer reviewed `/privacy` the night of 15 Nov 2026; `reviewed: true` is set (D-43). Keep the lawyer's written confirmation |
 | Q-09 | Production domain and DNS access | **Partly answered 15 Nov 2026** | Live at https://5ivestack-labs.vercel.app (the site stays noindex). Still open: a custom domain, if wanted |
 | Q-10 | Test devices | **Answered 15 Nov 2026** | Samsung S20 Ultra (about 412px wide). Owner's priority: seamless on any phone size, because customers have different phones. Covered by the M2 width-sweep checklist (320 to 430, tablet, landscape) |
 | Q-11 | Confirm the new L4 and L5 words: **Scalability** and **Usability** | **Answered 15 Nov 2026: confirmed** | Live in `src/content/layers.ts` |
 | Q-12 | Hero headline and primary call to action | **Partly answered 15 Nov 2026** | Owner asked for something catchier in the same direction, and for email to be the primary action. Now: "From sensor to screen, we build every layer." with an orange "Email us" button (subject prefilled) and WhatsApp as the secondary link. Still PLACEHOLDER until the owner approves. Alternatives are in D-38 |
-| Q-13 | Legal entity name, registration details and address | **Open** | Needed for `/privacy` (fill `src/content/privacy.ts`). Also needed: retention periods, MACRA complaint contact, the publication date |
+| Q-13 | Legal entity name, registration details and address | **Partly answered 16 Nov 2026** | Address supplied: "M & L Attorneys, Private Bag 202, Blantyre, Malawi" (entered as given; **please confirm** whether this is the registered office or the law firm's contact, and whether it should read "c/o"). Retention for enquiries: 1 year (entered). MACRA contact filled from MACRA's own complaints page. **Still needed:** the registered legal entity name, retention for server logs, retention for contract records |
 | Q-14 | Real device test results from the first-run checklists (M0, M1, M2) | **Open** | Blocks calling any milestone "done" |
+| Q-15 | Add a visible "Pause animation" or Simple mode button near the hero (WCAG 2.2.2)? | **Open** | Recommended in `docs/accessibility-review.md`. Default: not added until the owner decides |
+| Q-16 | Launch date, and approval of the placeholder copy (hero description, layer summaries) | **Open** | Needed before `SITE_INDEXABLE=true` (section 5b) |
 
 Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (light page with dark viewports), English only, Vercel hosting, owner can run npm and pnpm locally, logo and icon files supplied (the pack also has SVG variants without a background, usable if the reverse horizontal's own background is a problem), Switzer font supplied.
 
@@ -270,3 +291,4 @@ Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (
 | 15 Nov 2026 | Claude | Owner ran M2 and sent three desktop screenshots (D-35): renders correctly. Fixed the signal bar overshooting the bottom layer. Built M3a: Systems walk (sticky viewport, layer highlighting, `services` per layer), lazy mounting of each scene, `#systems` nav. Phone verification still outstanding. |
 | 15 Nov 2026 | Claude | Site went live on Vercel (owner). Phone screenshots from the S20 Ultra reviewed (D-35 addendum): home, menu sheet and Systems walk work. Built M3b: Work section from the owner's Resources.zip (8 screenshots converted to WebP, project facts from the owner's text), new headline, email as primary action with prefilled subject, `site.url` and `metadataBase`, wider camera fit margin (7.3 to 7.8), Work added to the nav. Q-04, Q-09, Q-11 and Q-12 updated. Deliverable zip now contains changed files only (owner's instruction). |
 | 15 Nov 2026 | Claude | Built M4: three-step consultation form, `/api/consult` route (Resend REST API, no new packages), `/privacy` page with DRAFT banner, `.env.example`, footer Privacy link, Consult in the nav. The form is switched off until three conditions are met (D-41). Validation logic tested with Node (dedupe, sanitising, error messages). Nothing else in M4 has been run. |
+| 16 Nov 2026 | Claude | Owner confirmed the privacy notice was lawyer-reviewed and supplied the address and 1-year retention. Set `reviewed: true`, filled address, retention for enquiries, last updated date and the MACRA contact (verified on macra.mw). Created `.env.local` template. Started M5a: noindex launch switch (`SITE_INDEXABLE`), robots and sitemap, metadata (title template, Open Graph, Twitter, canonical), JSON-LD, social preview image, baseline security headers, and an accessibility code review with two small fixes (decorative viewport hidden from assistive tech; required fields marked). Nothing run on a device. |

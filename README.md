@@ -12,7 +12,8 @@ Bespoke, scroll-driven, phone-first website for 5iveStack Labs (software, Androi
 | Every decision with alternatives and reasons | `docs/DECISIONS.md` |
 | Full build plan (milestones, architecture, page structure) | https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre |
 | Design tokens (single source of truth) | `src/app/globals.css` |
-| Draft privacy notice (needs legal review) | `docs/privacy-notice-draft.md` |
+| Draft privacy notice text and legal map | `docs/privacy-notice-draft.md` (the live page is `/privacy`) |
+| Accessibility review | `docs/accessibility-review.md` |
 | Brand pack notes and contrast numbers (copied from the logo package) | `docs/brand-pack-README.txt`, `docs/brand-pack-contrast.txt` |
 
 ## Licence warning
@@ -70,7 +71,7 @@ Light page (`paper`) with dark instrument viewports (`ink`) used only for live W
 
 ## Environment
 
-The consultation form uses four variables, listed with explanations in `.env.example`: `CONSULT_ENABLED`, `RESEND_API_KEY`, `CONSULT_TO`, `CONSULT_FROM`. Put them in Vercel (Project Settings, Environment Variables) and in a local `.env.local`; never commit real values. The form stays hidden until they are set, the privacy notice is marked reviewed, and the site is redeployed. Steps: `docs/HANDOFF.md` section 5a.
+The consultation form uses four variables, listed with explanations in `.env.example`: `CONSULT_ENABLED`, `RESEND_API_KEY`, `CONSULT_TO`, `CONSULT_FROM`. Put them in Vercel (Project Settings, Environment Variables) and in a local `.env.local`; never commit real values. The form stays hidden until they are set, the privacy notice is marked reviewed, and the site is redeployed. Steps: `docs/HANDOFF.md` section 5a. `SITE_INDEXABLE` (default false) is the switch that lets search engines index the site; see section 5b. `.env.local` is your own copy (never committed).
 
 ## Deployment
 

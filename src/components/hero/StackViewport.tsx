@@ -78,6 +78,7 @@ export function StackViewport({
   return (
     <div
       ref={hostRef}
+      aria-hidden="true"
       data-viewport
       data-tier-view={webgl ? "webgl" : "svg"}
       className={`relative overflow-hidden bg-ink ${className}`}

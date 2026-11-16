@@ -4,6 +4,7 @@ import { Footer } from "@/components/shell/Footer";
 import { Header } from "@/components/shell/Header";
 import { ScrollEngine } from "@/components/shell/ScrollEngine";
 import { site } from "@/content/site";
+import { indexable } from "@/lib/seo";
 import "./globals.css";
 
 // Display: Hubot Sans, variable weight 200-900 and width 75%-125% (SIL OFL 1.1).
@@ -53,10 +54,27 @@ const jetbrains = localFont({
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
-  title: site.name,
+  title: {
+    default: `${site.name} | Software, embedded systems, networks and CCTV`,
+    template: `%s | ${site.name}`,
+  },
   description: site.description,
-  // Keep noindex until launch (M5) so placeholder copy is never indexed. Remove it then.
-  robots: { index: false, follow: false },
+  applicationName: site.name,
+  // Noindex until SITE_INDEXABLE=true is set at build time (D-44).
+  robots: indexable ? { index: true, follow: true } : { index: false, follow: false },
+  openGraph: {
+    type: "website",
+    siteName: site.name,
+    title: `${site.name} | Software, embedded systems, networks and CCTV`,
+    description: site.description,
+    url: "/",
+    locale: "en_GB",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${site.name} | Software, embedded systems, networks and CCTV`,
+    description: site.description,
+  },
 };
 
 export const viewport: Viewport = {

@@ -249,7 +249,27 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 
 ## D-42 Privacy Notice page (15 Nov 2026, M4)
 **Decision:** `/privacy` renders the notice from `docs/privacy-notice-draft.md` Part B, with the Malawi Data Protection Act, 2024 section references checked against the Act's published text. Unknown facts live in `src/content/privacy.ts`; each shows as "[... to be confirmed]" and a DRAFT banner lists them until none remain and `reviewed` is true. The Resend email provider is now named. The page is `noindex` like the rest of the site and linked from the footer and from the form. The form's short notice reads its entity name and retention wording from the same facts, so the two cannot disagree.
-**Status:** Draft until reviewed by a Malawian lawyer (HANDOFF Q-08, A-08).
+**Status:** Draft until reviewed by a Malawian lawyer (HANDOFF Q-08, A-08). Superseded by D-43: reviewed on 15 Nov 2026 per the owner.
+
+## D-43 Privacy facts supplied and review recorded (16 Nov 2026)
+**Decision:** The owner said a Malawian lawyer reviewed `/privacy` on the night of 15 Nov 2026 and asked for `reviewed: true`, which is set. Facts entered in `src/content/privacy.ts`: address "M & L Attorneys, Private Bag 202, Blantyre" (the page adds ", Malawi"), retention for enquiries "for up to 1 year after our last contact" (the owner chose 1 year; the draft suggested 24 months), last updated "16 November 2026" (my choice of date, editable), and the MACRA contact "Malawi Communications Regulatory Authority, 9 Salmin Amour Road, Private Bag 261, Blantyre, Malawi; macra.mw", taken from MACRA's own complaints page on 16 Nov 2026 (confirm a data-protection-specific contact with MACRA or counsel).
+**Still missing:** the registered legal entity name, retention for server logs and for contract records. They show as "[... to be confirmed]" with a DRAFT banner on `/privacy`. The form gate does not check for them (it checks the switch, the key and `reviewed`), so it can be switched on while they are missing; the HANDOFF tells the owner to fill them first.
+**Caveat:** I have not seen the lawyer's review and cannot verify it. The address may be the law firm's own contact rather than the registered office (Q-13).
+**Status:** Decided; supersedes the "draft until reviewed" status of D-42.
+
+## D-44 Search-engine launch switch and metadata (16 Nov 2026, M5a)
+**Decision:** `SITE_INDEXABLE` (build-time environment variable, `src/lib/seo.ts`) controls everything: when not `true`, every page is noindex, `/robots.txt` disallows all and `/sitemap.xml` is empty. When `true`, pages are indexable, robots allows `/` but not `/api/` or `/tokens`, and the sitemap lists the home page and `/privacy` (no invented modified dates). Metadata: title template "%s | 5iveStack Labs" with default "5iveStack Labs | Software, embedded systems, networks and CCTV", description from `site.description` (still PLACEHOLDER copy), Open Graph and Twitter large-image cards, per-page canonical links, `metadataBase` from `site.url`, and one JSON-LD `Organization` with only facts already public on the site (name, url, logo, email, phone, English). The social preview is a static 1200 by 630 PNG: the brand reverse logo (900px wide) centred on brand ink, with alt text files.
+**Rejected:** a generated image through `ImageResponse` (extra runtime risk for no gain), claiming service areas or social profiles that were not supplied.
+**Status:** Decided. Unverified in the live build.
+
+## D-45 Baseline security headers (16 Nov 2026, M5a)
+**Decision:** `next.config.ts` sets `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin` and a `Permissions-Policy` that disables camera, microphone, geolocation, payment and USB, on every route. HTTPS and HSTS are handled by Vercel.
+**Not done on purpose:** a Content-Security-Policy. Next.js needs per-request nonces for inline scripts, and a wrong policy would break the site silently; add it later as its own tested task.
+**Status:** Decided. Check nothing breaks (HANDOFF M5a checks).
+
+## D-46 Accessibility review (16 Nov 2026, M5a)
+**Decision:** A static review against WCAG 2.1 AA with 2.2 notes is in `docs/accessibility-review.md`. Fixes made: the graphic viewport (SVG and canvas) is `aria-hidden` as a whole because its meaning is in the page text; required form fields are marked in their labels and with `required`. Open: a pause control near the hero (WCAG 2.2.2, Q-15), the command palette's dialog title, and all device tests (screen readers, keyboard, zoom, text spacing).
+**Status:** Review done; device testing outstanding.
 
 ---
 

@@ -10,7 +10,7 @@ import path from "node:path";
 */
 
 export const metadata: Metadata = {
-  title: "Token proof | 5iveStack Labs",
+  title: "Token proof",
   robots: { index: false, follow: false },
 };
 

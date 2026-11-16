@@ -11,8 +11,8 @@ import { site } from "@/content/site";
 */
 
 export const metadata: Metadata = {
-  title: "Privacy Notice | 5iveStack Labs",
-  robots: { index: false, follow: false },
+  title: "Privacy Notice",
+  alternates: { canonical: "/privacy" },
 };
 
 const link = "text-cobalt underline underline-offset-4";
