@@ -281,12 +281,21 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 - **Phones:** the canvas draws; camera markers are real buttons laid over it (44px targets, `touch-action: none` on the markers only), so dragging a marker moves it but touching anywhere else still scrolls the page. Arrow keys move a focused marker (Shift for bigger steps); sliders and buttons provide a non-drag route.
 - **On demand:** the planner downloads and runs only after "Open the planner" is pressed (dynamic import).
 - **Colours:** read from the CSS tokens at draw time; the plan sits in a dark viewport (a live sandbox, so a container is allowed).
-- **Still to come:** the owner's own experiments (Q-05) and the second demo from the plan (a signal scope for the embedded side).
+- **Still to come:** the owner's own experiments (Q-05). The second demo, the sensor sampling explorer, was built in D-50.
 **Status:** Decided. Unverified on devices.
 
 ## D-49 Email route diagnostics (16 Nov 2026)
 **Decision:** After the owner reported the form failing, `/api/consult` now logs the email provider's error name and message (first 300 characters; no request body, no visitor details), catches network errors when calling the provider, and trims spaces and wrapping quotes from `RESEND_API_KEY`, `CONSULT_TO`, `CONSULT_FROM` and `CONSULT_ENABLED`. Visitors still see only the generic message. The likely cause is Resend's test-sender rule (the test sender delivers only to the Resend account's own email), see HANDOFF section 5a troubleshooting.
-**Status:** Decided. Cause of the owner's failure not yet confirmed.
+**First result (16 Nov 2026):** the owner's log showed `status 401`. Per Resend's error documentation that is `missing_api_key`: Resend does not recognise the key it received. The 403 test-sender cause suspected earlier was therefore not (yet) the failure; it can still appear once the key is valid.
+**Status:** Decided. Fix is a correctly entered key (HANDOFF 5a item 4).
+
+## D-50 Lab: sensor sampling explorer (16 Nov 2026, M3d)
+**Decision:** The second Lab demo from the plan, for the embedded and IoT side. It shows what an analog-to-digital converter does to a sensor signal: a smooth wave (blue), measured at regular moments (orange dots) and rounded to one of 2^bits steps (white stepped line). Controls: signal frequency (50 to 5,000 Hz), sample rate (500 to 20,000 Hz), resolution (2 to 12 bits) and noise (0 to 10% of the 3.3 V range). Readouts: whether the signal is below the Nyquist limit (half the sample rate) or aliased, and if aliased the false frequency it appears as, the number of levels, millivolts per step, the worst-case rounding error (half a step), and the data rate (sample rate times bits).
+- **Honest framing:** the page calls it a simplified, ideal model that ignores real converter errors, sample-and-hold effects and anti-alias filters, so it explains the idea rather than predicting a real device. It runs in the browser only; nothing is sent or stored.
+- **Maths** (checked in Node): aliased frequency is |f minus fs times round(f divided by fs)|; step is 3.3 V divided by (2^bits minus 1); noise is a repeatable pseudo-random value per sample, so the chart does not flicker.
+- **Phones:** sliders only, no drag handling, so the page always scrolls normally. The chart window shows at least 4 signal periods or 16 samples, whichever is longer.
+- **Launcher:** both tools now share `ToolLauncher.tsx` (each tool is its own lazy chunk, loaded only when its button is pressed). `PlannerLauncher.tsx` is deleted.
+**Status:** Decided. Unverified on devices.
 
 ---
 

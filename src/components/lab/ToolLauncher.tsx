@@ -3,15 +3,28 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
-/* The planner only downloads and runs when the visitor asks for it (Lab rule, decision D-48). */
-const CoveragePlanner = dynamic(() => import("./CoveragePlanner"), {
-  ssr: false,
-  loading: () => <p className="text-body text-ink-muted">Loading the planner.</p>,
-});
+/*
+  Opens a Lab tool on demand (decision D-48, D-50). Each tool is its own lazily loaded
+  chunk, so nothing downloads or runs until the visitor presses the button.
+*/
+const loading = () => <p className="text-body text-ink-muted">Loading.</p>;
+const tools = {
+  planner: dynamic(() => import("./CoveragePlanner"), { ssr: false, loading }),
+  scope: dynamic(() => import("./SignalScope"), { ssr: false, loading }),
+};
 
-export function PlannerLauncher() {
+export function ToolLauncher({
+  tool,
+  openLabel,
+  closeLabel,
+}: {
+  tool: keyof typeof tools;
+  openLabel: string;
+  closeLabel: string;
+}) {
   const [open, setOpen] = useState(false);
   const regionRef = useRef<HTMLDivElement>(null);
+  const Tool = tools[tool];
 
   useEffect(() => {
     if (open) regionRef.current?.focus();
@@ -24,19 +37,19 @@ export function PlannerLauncher() {
         onClick={() => setOpen(true)}
         className="inline-flex min-h-11 items-center rounded-control bg-orange px-6 text-body font-medium text-ink"
       >
-        Open the planner
+        {openLabel}
       </button>
     );
   }
   return (
     <div ref={regionRef} tabIndex={-1} className="focus:outline-none">
-      <CoveragePlanner />
+      <Tool />
       <button
         type="button"
         onClick={() => setOpen(false)}
         className="mt-8 inline-flex min-h-11 items-center rounded-control border border-ink px-6 text-body font-medium"
       >
-        Close the planner
+        {closeLabel}
       </button>
     </div>
   );
