@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ConsultSection } from "@/components/consult/ConsultSection";
 import { StackViewport } from "@/components/hero/StackViewport";
 import { SystemsWalk } from "@/components/hero/SystemsWalk";
+import { LabSection } from "@/components/lab/LabSection";
 import { WorkSection } from "@/components/work/WorkSection";
 import { site } from "@/content/site";
 
@@ -75,6 +76,7 @@ export default function Home() {
 
       <SystemsWalk />
       <WorkSection />
+      <LabSection />
       <ConsultSection />
     </main>
   );

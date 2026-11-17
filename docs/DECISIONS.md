@@ -271,6 +271,23 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 **Decision:** A static review against WCAG 2.1 AA with 2.2 notes is in `docs/accessibility-review.md`. Fixes made: the graphic viewport (SVG and canvas) is `aria-hidden` as a whole because its meaning is in the page text; required form fields are marked in their labels and with `required`. Open: a pause control near the hero (WCAG 2.2.2, Q-15), the command palette's dialog title, and all device tests (screen readers, keyboard, zoom, text spacing).
 **Status:** Review done; device testing outstanding.
 
+## D-47 Pause-animation button declined (16 Nov 2026)
+**Decision:** The owner said not to apply the pause-animation button recommended in the accessibility review. It had been built (a global paused flag in the tier store and a toggle under the hero) and was removed completely; nothing of it was delivered. The ways to stop the animation remain Simple mode (footer and Menu) and the visitor's reduced-motion setting, which the site respects. WCAG 2.2.2 (Pause, Stop, Hide) is a Level A criterion, so this is a known, owner-accepted gap; revisit if the site is ever assessed against WCAG.
+**Status:** Decided by the owner.
+
+## D-48 Lab: CCTV coverage planner (16 Nov 2026, M3c)
+**Decision:** The Lab section (`#lab`) opens with a real, working tool: a CCTV coverage planner. A 12 by 8 metre room has outer walls and a partition with a 2 metre doorway. Up to four cameras, each with direction (0 to 359 degrees), field of view (40 to 120) and range (3 to 20 metres). The room is sampled on a 0.25 m grid; a camera sees a point if it is in range, inside the field of view, and no wall blocks the straight line. The plan shows covered cells (brighter where cameras overlap) and the coverage percentage in a live status line.
+- **Honest framing:** the page says it is a simplified 2D estimate that ignores lens quality, lighting, mounting height, furniture and people, so it is a way to think about placement, not a design or a quote. It runs only in the browser; nothing is sent or stored (so it adds nothing to the privacy notice).
+- **Phones:** the canvas draws; camera markers are real buttons laid over it (44px targets, `touch-action: none` on the markers only), so dragging a marker moves it but touching anywhere else still scrolls the page. Arrow keys move a focused marker (Shift for bigger steps); sliders and buttons provide a non-drag route.
+- **On demand:** the planner downloads and runs only after "Open the planner" is pressed (dynamic import).
+- **Colours:** read from the CSS tokens at draw time; the plan sits in a dark viewport (a live sandbox, so a container is allowed).
+- **Still to come:** the owner's own experiments (Q-05) and the second demo from the plan (a signal scope for the embedded side).
+**Status:** Decided. Unverified on devices.
+
+## D-49 Email route diagnostics (16 Nov 2026)
+**Decision:** After the owner reported the form failing, `/api/consult` now logs the email provider's error name and message (first 300 characters; no request body, no visitor details), catches network errors when calling the provider, and trims spaces and wrapping quotes from `RESEND_API_KEY`, `CONSULT_TO`, `CONSULT_FROM` and `CONSULT_ENABLED`. Visitors still see only the generic message. The likely cause is Resend's test-sender rule (the test sender delivers only to the Resend account's own email), see HANDOFF section 5a troubleshooting.
+**Status:** Decided. Cause of the owner's failure not yet confirmed.
+
 ---
 
 ## Carried-forward decisions from the plan (still in force)

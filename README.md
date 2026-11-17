@@ -51,6 +51,7 @@ src/app/        layout.tsx, page.tsx (home), tokens/page.tsx (developer-only pro
 src/components/hero/   StackViewport, StackSvg, StackScene, SystemsWalk (five-layer hero and Systems walk)
 src/components/work/   WorkSection (selected work with real screenshots)
 src/components/consult/   ConsultSection, ConsultForm (consultation form, switched off until activated)
+src/components/lab/   LabSection, PlannerLauncher, CoveragePlanner (CCTV coverage planner)
 src/app/api/consult/   route.ts (sends the request email)
 src/app/privacy/   page.tsx (Privacy Notice)
 src/components/shell/  Header, CommandPalette, ScrollEngine, Footer, SimpleModeToggle

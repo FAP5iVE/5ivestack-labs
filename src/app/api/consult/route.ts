@@ -11,6 +11,11 @@ import { ORG_OPTIONS, SERVICE_OPTIONS, labelFor, validate } from "@/lib/consult"
 
 const hits = new Map<string, number[]>();
 
+// Environment values pasted into Vercel sometimes carry spaces or wrapping quotes; remove them.
+function env(name: string): string {
+  return (process.env[name] ?? "").trim().replace(/^["']+|["']+$/g, "").trim();
+}
+
 // Light per-instance rate limit: at most 5 requests per IP per hour. Serverless
 // instances do not share memory, so this only blunts casual abuse.
 function limited(ip: string): boolean {
@@ -69,10 +74,10 @@ export async function POST(request: Request) {
   }
   const v = result.value;
 
-  const key = process.env.RESEND_API_KEY;
+  const key = env("RESEND_API_KEY");
   if (!key) return fail(503, "unavailable");
-  const to = process.env.CONSULT_TO || site.email;
-  const from = process.env.CONSULT_FROM || "5iveStack Labs <onboarding@resend.dev>";
+  const to = env("CONSULT_TO") || site.email;
+  const from = env("CONSULT_FROM") || "5iveStack Labs <onboarding@resend.dev>";
 
   const text = [
     "New consultation request from the website.",
@@ -91,7 +96,9 @@ export async function POST(request: Request) {
     `Privacy notice last updated: ${privacy.lastUpdated ?? "not recorded"}.`,
   ].join("\n");
 
-  const response = await fetch("https://api.resend.com/emails", {
+  let response: Response;
+  try {
+    response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -102,10 +109,22 @@ export async function POST(request: Request) {
       text,
     }),
   });
+  } catch {
+    console.error("consult: could not reach the email provider (network error)");
+    return fail(502, "send_failed");
+  }
 
   if (!response.ok) {
-    // Status only. Never log the request body or the visitor's details.
-    console.error("consult: email provider returned status", response.status);
+    // Log the provider's reason so the owner can read it in Vercel > Logs. Only the provider's
+    // error name and message are logged (never the request body or the visitor's details).
+    let reason = "";
+    try {
+      const data = (await response.json()) as { name?: string; message?: string };
+      reason = `${data.name ?? ""}: ${String(data.message ?? "").slice(0, 300)}`;
+    } catch {
+      reason = "(no readable error body)";
+    }
+    console.error(`consult: email provider returned status ${response.status} ${reason}`);
     return fail(502, "send_failed");
   }
   return Response.json({ ok: true });

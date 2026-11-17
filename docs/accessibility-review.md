@@ -25,7 +25,7 @@ No blocking issues were found in the code. Two small fixes were made in this pas
 |---|---|
 | 2.1.1 Keyboard | Pass (by design). Native controls everywhere. The screenshot strips are focusable and scrollable with arrow keys. The command palette (cmdk) manages its own focus and returns it to the Menu button. |
 | 2.1.2 No keyboard trap | Pass (by design). The palette closes with Escape or the Close button. The sticky viewport has no focusable content. |
-| 2.2.2 Pause, stop, hide | **Open (medium).** The hero and Systems graphics animate continuously (signal packets, blinking cursor) for longer than 5 seconds. A way to stop them exists (Simple mode in the footer and the Menu, and the system reduced-motion setting), but the footer is far from the hero. Recommendation: add a "Pause animation" or "Simple mode" control near the hero. |
+| 2.2.2 Pause, stop, hide | **Known gap, accepted by the owner (16 Nov 2026).** The hero and Systems graphics animate continuously (signal packets, blinking cursor) for longer than 5 seconds. A way to stop them exists (Simple mode in the footer and the Menu, and the system reduced-motion setting) but there is no control beside the hero. The owner declined a pause button (D-47). This is a Level A criterion. |
 | 2.4.1 Bypass blocks | Pass. The skip link is the first stop and moves focus to `main`. |
 | 2.4.2 Page titled | Pass. Titles use a template ("Privacy Notice | 5iveStack Labs"). |
 | 2.4.3 Focus order, 2.4.7 Focus visible | Pass (by design). Visible 2px ink ring (paper inside dark viewports). Focus moves to the new heading at each form step. |
@@ -49,6 +49,6 @@ No blocking issues were found in the code. Two small fixes were made in this pas
 
 ## Open items
 
-1. **Pause control near the hero** (WCAG 2.2.2). Decision needed: add a visible "Pause animation" or "Simple mode" button beside the hero graphic?
+1. **Pause control near the hero** (WCAG 2.2.2): declined by the owner on 16 Nov 2026; accepted gap (D-47).
 2. **Command palette title.** Verify the dialog announces a name with a screen reader; fix path in D-20.
 3. **Device tests** (nothing below has been done): NVDA with Firefox or Chrome on Windows; TalkBack on the S20 Ultra; keyboard-only run through the whole page, the menu and the form; 200% and 400% zoom; text-spacing bookmarklet; reduced-motion and Save-Data settings.

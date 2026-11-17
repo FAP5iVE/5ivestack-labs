@@ -10,8 +10,8 @@ import { privacy } from "@/content/privacy";
 */
 export function consultEnabled(): boolean {
   return (
-    process.env.CONSULT_ENABLED === "true" &&
-    Boolean(process.env.RESEND_API_KEY) &&
+    (process.env.CONSULT_ENABLED ?? "").trim().replace(/^["']+|["']+$/g, "") === "true" &&
+    Boolean((process.env.RESEND_API_KEY ?? "").trim()) &&
     privacy.reviewed
   );
 }

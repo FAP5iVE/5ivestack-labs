@@ -106,6 +106,14 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 - [ ] Turn on a phone's battery saver or Data Saver and reload: the site should show the SVG (Save-Data or reduced motion).
 - [ ] In the layers list, every row reads cleanly at 320px (the value label above the layer name).
 
+### M3c checks (Lab: CCTV coverage planner)
+- [ ] The Lab section shows a title, a short description, the "simplified estimate" note and an "Open the planner" button. Nothing heavy downloads until you press it.
+- [ ] Pressing it shows a dark floor plan (12 by 8 metres) with a wall in the middle that has a gap (doorway), one numbered orange camera marker, and a blue shaded area showing coverage. "Coverage: NN% of the room, with 1 camera." appears under the plan.
+- [ ] Moving the Direction, Field of view and Range sliders changes the shaded area and the percentage. Coverage behind the wall is blocked except through the doorway.
+- [ ] Phone: dragging a camera marker moves it WITHOUT scrolling the page; dragging anywhere else on the plan scrolls the page normally. The markers are easy to hit (44px). Nothing overflows sideways at 320 to 430px. Sliders are easy to use by thumb.
+- [ ] Keyboard: Tab to a marker, move it with the arrow keys (Shift for bigger steps); Tab reaches the camera buttons and sliders; "Add camera" (up to 4), "Remove selected" and "Close the planner" work.
+- [ ] Two cameras overlapping show a brighter overlap. The percentage never exceeds 100.
+
 ### M5a checks (launch readiness)
 - [ ] View source on the live site: `<title>` is "5iveStack Labs | Software, embedded systems, networks and CCTV"; there are Open Graph and Twitter tags; there is one JSON-LD script with the organisation, email and phone; the canonical link is `/` on the home page and `/privacy` on the Privacy Notice. While `SITE_INDEXABLE` is not true, `robots` says noindex.
 - [ ] `/robots.txt` disallows everything now, and allows `/` (not `/api/` or `/tokens`) after launch. `/sitemap.xml` is empty now and lists two pages after launch.
@@ -165,6 +173,7 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | `src/content/site.ts` | Company name, contact details (owner supplied), PLACEHOLDER description (D-30, D-31) |
 | `src/content/layers.ts` | The five layers: values, names, summaries (PLACEHOLDER), shader mode and seed (D-25) |
 | `src/components/hero/StackViewport.tsx` | Dark viewport used by hero and Systems walk: SVG, then lazily loaded WebGL scene (mounted only once near the screen), error boundary, visibility pausing; props `mode`, `focus`, `className` (D-28, D-36) |
+| `src/components/lab/LabSection.tsx`, `PlannerLauncher.tsx`, `CoveragePlanner.tsx` | Lab section with the CCTV coverage planner, opened on demand (D-48) |
 | `src/components/work/WorkSection.tsx` | Work section: text column plus real screenshots, swipe strip on phones (D-37) |
 | `src/content/work.ts` | Project facts and screenshot metadata, from the owner's own text. No invented outcomes |
 | `public/work/` | WebP screenshots (8 files, about 400 KB in total) for SMS Malawi and Saviour Digital Solutions |
@@ -195,6 +204,7 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 - **A-04 Verify the Tailwind spacing-scale enforcement option** (D-09), or keep the scanner as the control.
 - **A-05 Create the Vercel project** (Git integration, Node 22). Production domain: see Q-09.
 - **A-07 Keep the Git repository PRIVATE** and do not publish the font files (D-33). Anyone outside the company who needs to work on the code must download Switzer from Fontshare themselves and add it to `src/fonts/`.
+- **A-09 Consultation email delivery:** the first live test failed with the generic message (owner, 16 Nov 2026). See the troubleshooting list in section 5a. Cause not yet confirmed.
 - **A-08 Privacy notice:** `/privacy` is built and shows a DRAFT banner listing the facts still missing. Owner: fill `src/content/privacy.ts` (items in `docs/privacy-notice-draft.md` Part A3), then have a Malawian lawyer review the page, then set `reviewed: true`.
 - **A-06 Version control:** the project is not yet in a Git repository. Initialise, make a first commit after A-02 passes, and add a CI step running `pnpm check`.
 
@@ -204,7 +214,7 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | M0 foundation | Tokens, fonts, logo, checks | none | **Written, unverified** |
 | M1 scroll and shell | Lenis plus GSAP lifecycle, header, skip link, command palette with visible phone Menu button, Simple mode toggle, rendering-tier detection | `gsap`, `lenis`, `cmdk` (`@gsap/react` moved to M2, D-02) | **Written, unverified.** Anchors, keyboard, focus, reduced motion all work on a real phone (M1 checks above) |
 | M2 hero | **Written, unverified** (D-25 to D-32). Single canvas in the hero viewport (not Drei `View`, D-26), five procedural layers, trace shader (orange signal, sky and paper lines, no bloom), load sequence, SVG Tier 0, step-down, context-loss handling | `three`, `@react-three/fiber`, `@react-three/drei`, `@gsap/react` (+ `@types/three`) | Smooth on a mid-range Android, or the visitor lands on Tier 0 unharmed. Removes the M0 proof page |
-| M3 sections (3a Systems walk and 3b Work are written, D-36 and D-37; Lab and Principles wait for content) | Systems walk (CSS sticky plus ScrollTrigger progress), Work drawers, Lab, Principles, then two added Lab demos | `@react-three/rapier` (Lab only, lazy) | All content real; every drawer works by touch |
+| M3 sections (3a Systems walk, 3b Work and 3c Lab with the coverage planner are written, D-36, D-37 and D-48; the owner's own Lab experiments and the Principles section wait for content) | Systems walk (CSS sticky plus ScrollTrigger progress), Work drawers, Lab, Principles, then two added Lab demos | `@react-three/rapier` (Lab only, lazy) | All content real; every drawer works by touch |
 | M4 consultation (**written, switched off until activated, see section 5a**) | Step-by-step configurator, route handler, email, spam checks | `zod`, email provider SDK (default pick Resend: confirm limits and domain verification first) | A phone-submitted test request arrives in the inbox |
 | M5 hardening | Profiling, bundle analysis, image and font audit, accessibility review, SEO, Vercel deploy, real-device pass | `r3f-perf` (dev) | Budgets met on the throttled mobile profile |
 
@@ -221,6 +231,16 @@ The form is built but **invisible until all three switches are on** (D-41). Visi
 4. **Local test first:** the owner's `.env.local` (not committed) already has the right names. Paste the key after `RESEND_API_KEY=`, run `pnpm dev`, and the form appears in the Consult section. **Vercel environment variables** (Project Settings, Environment Variables, Production): `CONSULT_ENABLED=true`, `RESEND_API_KEY=<the key>`, `CONSULT_TO=fivestacklabs@gmail.com`, `CONSULT_FROM=5iveStack Labs <onboarding@resend.dev>`. Never commit real values.
 5. **Redeploy** (the page is built statically, so the form only appears on the next build).
 6. **Test from a phone:** submit a request; it must arrive in the inbox with Reply-To set to the visitor's address. Then check the M4 list in section 3.
+
+### If the form says "We could not send your request" (troubleshooting, 16 Nov 2026)
+That message is deliberately generic. Find the real reason in this order:
+1. **Vercel, your project, Logs (Runtime Logs), filter on `/api/consult`.** After the update in this delivery the log line reads like `consult: email provider returned status 403 validation_error: You can only send testing emails to your own email address ...`. (The earlier build logged only the status number, e.g. `status 403`.)
+2. **The most likely cause: Resend's test sender.** While `CONSULT_FROM` is `5iveStack Labs <onboarding@resend.dev>`, Resend delivers ONLY to the email address your Resend account was created with. If you signed up to Resend with a different email than fivestacklabs@gmail.com, sends to `CONSULT_TO` are refused. Fix: set `CONSULT_TO` in Vercel to the email you use to log in to Resend (requests then arrive in that inbox, with Reply-To set to the visitor), or create the Resend account with fivestacklabs@gmail.com.
+3. **Do not set `CONSULT_FROM` to a Gmail address.** Resend refuses to send from a domain you have not verified (gmail.com can never be verified). Leave it as `5iveStack Labs <onboarding@resend.dev>` until you own a domain and verify it in Resend.
+4. **401 or "API key is invalid":** create a new key in Resend (Sending access, all domains), paste it into Vercel with no spaces or quotes (the update trims them), and redeploy.
+5. **Variables not applied:** Vercel only applies new variables on the next deployment, and they must be set for the **Production** environment. Redeploy after every change.
+6. **Resend dashboard, Emails or Logs:** shows each attempt and the reason it was refused.
+If the log says something else, send me that one line (it contains no visitor details) and I will fix it.
 
 ## 5b. Launching to search engines (M5a)
 The site is public at https://5ivestack-labs.vercel.app but tells search engines to ignore it (D-44). To launch:
@@ -251,7 +271,7 @@ Status: **Answered** (decision recorded), **Partly** (some information received)
 | Q-12 | Hero headline and primary call to action | **Partly answered 15 Nov 2026** | Owner asked for something catchier in the same direction, and for email to be the primary action. Now: "From sensor to screen, we build every layer." with an orange "Email us" button (subject prefilled) and WhatsApp as the secondary link. Still PLACEHOLDER until the owner approves. Alternatives are in D-38 |
 | Q-13 | Legal entity name, registration details and address | **Partly answered 16 Nov 2026** | Address supplied: "M & L Attorneys, Private Bag 202, Blantyre, Malawi" (entered as given; **please confirm** whether this is the registered office or the law firm's contact, and whether it should read "c/o"). Retention for enquiries: 1 year (entered). MACRA contact filled from MACRA's own complaints page. **Still needed:** the registered legal entity name, retention for server logs, retention for contract records |
 | Q-14 | Real device test results from the first-run checklists (M0, M1, M2) | **Open** | Blocks calling any milestone "done" |
-| Q-15 | Add a visible "Pause animation" or Simple mode button near the hero (WCAG 2.2.2)? | **Open** | Recommended in `docs/accessibility-review.md`. Default: not added until the owner decides |
+| Q-15 | Add a visible "Pause animation" button near the hero (WCAG 2.2.2)? | **Answered 16 Nov 2026: no** | The owner declined. It was built and then fully removed. The remaining way to stop the animation is Simple mode (footer and Menu) and the visitor's reduced-motion setting. WCAG 2.2.2 is a Level A criterion; the owner has accepted the gap (recorded in `docs/accessibility-review.md`) |
 | Q-16 | Launch date, and approval of the placeholder copy (hero description, layer summaries) | **Open** | Needed before `SITE_INDEXABLE=true` (section 5b) |
 
 Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (light page with dark viewports), English only, Vercel hosting, owner can run npm and pnpm locally, logo and icon files supplied (the pack also has SVG variants without a background, usable if the reverse horizontal's own background is a problem), Switzer font supplied.
@@ -292,3 +312,4 @@ Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (
 | 15 Nov 2026 | Claude | Site went live on Vercel (owner). Phone screenshots from the S20 Ultra reviewed (D-35 addendum): home, menu sheet and Systems walk work. Built M3b: Work section from the owner's Resources.zip (8 screenshots converted to WebP, project facts from the owner's text), new headline, email as primary action with prefilled subject, `site.url` and `metadataBase`, wider camera fit margin (7.3 to 7.8), Work added to the nav. Q-04, Q-09, Q-11 and Q-12 updated. Deliverable zip now contains changed files only (owner's instruction). |
 | 15 Nov 2026 | Claude | Built M4: three-step consultation form, `/api/consult` route (Resend REST API, no new packages), `/privacy` page with DRAFT banner, `.env.example`, footer Privacy link, Consult in the nav. The form is switched off until three conditions are met (D-41). Validation logic tested with Node (dedupe, sanitising, error messages). Nothing else in M4 has been run. |
 | 16 Nov 2026 | Claude | Owner confirmed the privacy notice was lawyer-reviewed and supplied the address and 1-year retention. Set `reviewed: true`, filled address, retention for enquiries, last updated date and the MACRA contact (verified on macra.mw). Created `.env.local` template. Started M5a: noindex launch switch (`SITE_INDEXABLE`), robots and sitemap, metadata (title template, Open Graph, Twitter, canonical), JSON-LD, social preview image, baseline security headers, and an accessibility code review with two small fixes (decorative viewport hidden from assistive tech; required fields marked). Nothing run on a device. |
+| 16 Nov 2026 | Claude | Owner declined the pause-animation button: built and fully removed (Q-15 answered no). Owner reported the consultation form shows "We could not send your request" after adding the Resend key in Vercel. Hardened `/api/consult`: logs the provider's error name and message (no visitor data), catches network failures, trims spaces and quotes from the environment values. Added troubleshooting steps (section 5a). Built M3c: Lab section with a working CCTV coverage planner (opens on demand, touch handles, keyboard support), Lab in the nav. Nothing run on a device. |
