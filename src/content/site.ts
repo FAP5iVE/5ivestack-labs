@@ -1,15 +1,15 @@
 /*
   Company facts and copy used across the site.
   Contact details were supplied by the owner on 15 Nov 2026.
-  PLACEHOLDER copy is marked below: the owner approved drafting it and will replace it.
+  Description copy: approved by the owner on 18 Nov 2026 and polished the same day (D-51).
 */
 export const site = {
   name: "5iveStack Labs",
   url: "https://5ivestack-labs.vercel.app", // live since 15 Nov 2026; replace when a custom domain exists (HANDOFF Q-09)
 
-  // PLACEHOLDER (owner approved on 15 Nov 2026, to be rewritten).
+  // Approved by the owner on 18 Nov 2026. "Registered" is the owner's own statement that the company is registered with the Malawi government.
   description:
-    "5iveStack Labs designs, builds and installs technology systems: custom software, Android apps, embedded and IoT hardware, networks and CCTV security, with IT consultation across all of it.",
+    "We are a registered Malawian technology company. We design, build and install complete systems: custom software and Android apps, embedded and IoT hardware, networks and CCTV security, with IT consultation across all of it.",
 
   email: "fivestacklabs@gmail.com",
   emailHref: "mailto:fivestacklabs@gmail.com",

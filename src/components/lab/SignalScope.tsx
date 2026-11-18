@@ -30,7 +30,7 @@ function token(name: string): string {
 const nf = (n: number, digits = 0) =>
   n.toLocaleString("en-GB", { maximumFractionDigits: digits });
 
-const sliderRow = "grid grid-cols-[8rem_1fr_6rem] items-center gap-4 border-t border-rule py-2";
+const sliderRow = "grid grid-cols-[6rem_1fr_5rem] items-center gap-2 border-t border-rule py-2 md:grid-cols-[8rem_1fr_6rem] md:gap-4";
 
 export default function SignalScope() {
   const [freq, setFreq] = useState(500); // signal frequency, Hz

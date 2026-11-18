@@ -159,3 +159,58 @@
     }
   }
 }
+
+/*
+  Work gallery: a curved 3D ribbon with depth stacking (D-53, CoverFlow.tsx).
+  --o is a card's offset from the centre card (0, +-1, +-2), --ad is its absolute value.
+  Each card sits on an outward (convex) arc: further from the centre it moves sideways,
+  recedes in depth, tilts away, shrinks and dims, and its z-index drops, so it tucks
+  behind the card in front. Percentages inside translateX refer to the card's own width.
+*/
+@layer components {
+  .flow-stage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 7 / 3;
+    overflow: hidden;
+    touch-action: pan-y; /* vertical swipes keep scrolling the page */
+    user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
+  }
+  .flow-stage:active {
+    cursor: grabbing;
+  }
+  .flow-list {
+    position: absolute;
+    inset: 0;
+    perspective: 1200px;
+    perspective-origin: 50% 50%;
+  }
+  .flow-card {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 62%;
+    z-index: calc(10 - var(--ad));
+    transform: translate(-50%, -50%) translateX(calc(var(--o) * 52%))
+      translateZ(calc(var(--ad) * -100px)) rotateY(calc(var(--o) * 30deg))
+      scale(calc(1 - var(--ad) * 0.08));
+    filter: brightness(calc(1 - var(--ad) * 0.22));
+    transition:
+      transform 600ms var(--ease-out-expo),
+      filter 600ms var(--ease-out-expo);
+  }
+  .flow-card[data-hidden="true"] {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  @media (min-width: 64rem) {
+    .flow-stage {
+      aspect-ratio: 5 / 2;
+    }
+    .flow-card {
+      width: 54%;
+    }
+  }
+}

@@ -103,7 +103,7 @@ const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n
 
 const buttonClass =
   "inline-flex min-h-11 items-center rounded-control border border-ink px-4 text-body font-medium disabled:opacity-50";
-const sliderRow = "grid grid-cols-[7rem_1fr_4rem] items-center gap-4 border-t border-rule py-2";
+const sliderRow = "grid grid-cols-[6rem_1fr_3.5rem] items-center gap-2 border-t border-rule py-2 md:grid-cols-[7rem_1fr_4rem] md:gap-4";
 
 export default function CoveragePlanner() {
   const [cameras, setCameras] = useState<Camera[]>([

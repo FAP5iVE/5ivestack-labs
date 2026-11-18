@@ -4,8 +4,8 @@
   Value labels were confirmed by the owner on 15 Nov 2026. L4 and L5 replace the
   originally proposed "Innovation" and "Creativity" (buzzwords) with concrete,
   testable qualities. See docs/DECISIONS.md D-25.
-  The summaries below are PLACEHOLDER copy to be replaced with proof lines from
-  real work (HANDOFF Q-04).
+  The summaries below were approved by the owner on 18 Nov 2026 and polished the
+  same day (D-51). They describe the services only: no outcomes or numbers.
 */
 export type Layer = {
   level: 1 | 2 | 3 | 4 | 5;
@@ -26,7 +26,7 @@ export const layers: readonly Layer[] = [
     value: "Precision",
     name: "Hardware and sensors",
     summary:
-      "Embedded systems and IoT hardware, from custom boards to the sensors that feed them.",
+      "We design embedded and IoT hardware, from custom circuit boards to the sensors that measure the real world.",
     services: ["Embedded systems and IoT hardware design"],
     mode: 0,
     seed: 1.7,
@@ -36,7 +36,7 @@ export const layers: readonly Layer[] = [
     value: "Reliability",
     name: "Firmware and device networks",
     summary:
-      "Firmware, connected devices and enterprise hardware setup, installed and configured to keep running.",
+      "Firmware, device connectivity and enterprise hardware setup, installed and configured to keep running day after day.",
     services: ["Enterprise hardware setup, installation and configuration"],
     mode: 1,
     seed: 4.3,
@@ -46,7 +46,7 @@ export const layers: readonly Layer[] = [
     value: "Security",
     name: "Networks and physical security",
     summary:
-      "Network design, installation and configuration, and CCTV installation that protects people and property.",
+      "Network design, installation and configuration, and CCTV installation that protects people, property and data.",
     services: ["Network design, installation and configuration", "CCTV and physical security installation"],
     mode: 2,
     seed: 2.9,
@@ -56,7 +56,7 @@ export const layers: readonly Layer[] = [
     value: "Scalability",
     name: "Software and backend",
     summary:
-      "Custom software solutions and full-stack web platforms, built so they can grow.",
+      "Custom software and full-stack web platforms, designed to grow with your users and your business.",
     services: ["Custom software solutions", "Full-stack web platforms"],
     mode: 3,
     seed: 6.1,
@@ -66,7 +66,7 @@ export const layers: readonly Layer[] = [
     value: "Usability",
     name: "Android and interfaces",
     summary:
-      "Native and cross-platform Android apps and web interfaces that people can use without training.",
+      "Native and cross-platform Android apps and web interfaces that people can pick up and use without training.",
     services: ["Android applications, native and cross-platform"],
     mode: 4,
     seed: 3.4,
@@ -77,5 +77,5 @@ export const consultation = {
   label: "All five layers",
   name: "IT and technical consultation",
   summary:
-    "Independent advice across hardware, networks and software, before you commit to a build.",
+    "Practical advice across hardware, networks and software, so you choose the right system before you commit to a build.",
 } as const;

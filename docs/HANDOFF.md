@@ -1,6 +1,6 @@
 # Handoff: where the project stands
 
-Last updated: 16 Nov 2026. M0 to M4 are written; the privacy notice is marked reviewed; launch-readiness work (M5a: SEO, security headers, accessibility review) is written. The consultation form needs only the Resend key and a redeploy (section 5a). Two privacy facts and a few device tests are still open. **The site is live at https://5ivestack-labs.vercel.app** (noindex). The owner has checked it on a desktop and on a Samsung S20 Ultra (section 2). Other phones, an iPhone and the later features are unverified.
+Last updated: 18 Nov 2026 (copy approved and polished, new footer, 3D Work gallery, six-tool Lab; see the change log). M0 to M4 are written; the privacy notice is marked reviewed; launch-readiness work (M5a: SEO, security headers, accessibility review) is written. The consultation form needs only the Resend key and a redeploy (section 5a). Two privacy facts and a few device tests are still open. **The site is live at https://5ivestack-labs.vercel.app** (noindex). The owner has checked it on a desktop and on a Samsung S20 Ultra (section 2). Other phones, an iPhone and the later features are unverified.
 Read this first, then `docs/DECISIONS.md`. Update this file at the end of every working session: status, remaining work, open questions, change log.
 
 Plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre
@@ -106,6 +106,25 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 - [ ] Turn on a phone's battery saver or Data Saver and reload: the site should show the SVG (Save-Data or reduced motion).
 - [ ] In the layers list, every row reads cleanly at 320px (the value label above the layer name).
 
+### M3e checks (18 Nov 2026: footer, Work gallery, Lab tools)
+Footer (D-52):
+- [ ] Dark ink footer with four bands; the headline wraps cleanly at 320, 360, 412 and 430 px; "Email us" is orange with an ink label; no sideways scroll.
+- [ ] The five value segments show L1 to L5 with their words; on touch they simply show (hover fill is decoration only).
+- [ ] Explore links scroll to Systems, Work, Lab and Consult from the home page AND take you to the home page sections from `/privacy`.
+- [ ] Simple mode button is readable on dark (paper border, sky help text) and still works; Tab focus ring is paper; "Back to top" scrolls to the top.
+Work gallery (D-53):
+- [ ] Each project shows a curved ribbon: centre screenshot facing you, neighbours tilted away and tucked behind it. Press a side screenshot, swipe or drag sideways, use Previous and Next, or press arrow keys, Home and End after Tab-focusing the gallery.
+- [ ] Phone: swiping sideways changes the screenshot; swiping up or down scrolls the page and does not change it; no sideways page scroll at 320 to 430 px; Previous and Next are 44 px tall.
+- [ ] Simple mode on (footer): the plain swipeable strip appears instead (no 3D). Reduced motion does the same.
+- [ ] The live-region line reads "Screen 2 of 4" and a screen reader announces the description of the new screenshot.
+Lab (D-54): each tool downloads only after its button is pressed (Network tab).
+- [ ] Six tools in order: sensor sampling (L1), device link reliability (L2), CCTV planner (L3), server capacity (L4), readability and touch target (L5), code lab.
+- [ ] Link reliability: default shows 30% loss, 2 retries, alert after 3; a grid of 60 squares (white, orange, outline), text with about 97.3%, 1.39 attempts, about 39 reports lost a day, about 0.03 false alerts a day. At 0% loss all squares are white. Raise loss to 70% with 0 retries: many outlines and orange rings.
+- [ ] Capacity planner: default 1,500 users, 6 requests a minute, 100 a second per server, 2 servers: "Busy but coping", 75% busy, about 40 ms, "for 1,500 users you would want 3 servers". Set 5,000 users: "Overloaded", orange dot at the top.
+- [ ] Readability check: starts as the site's ink on paper (17.5 to 1, all Pass except button size AAA at 32 px). Choose orange text on paper: about 2.8 to 1, Fail. The 44 px target passes both button rows.
+- [ ] Code lab: Run shows the output of each of the three examples; `while (true) {}` stops with "Stopped" after about 2 seconds and the page stays usable; a typing mistake shows "Error: SyntaxError"; `typeof fetch` prints `undefined`. The text box does not zoom the page on iPhone.
+- [ ] Phone, 320 px: every slider row has label and value above and a full-width slider below; the older tools' rows (sampling, CCTV) are usable.
+
 ### M3d checks (Lab: sensor sampling explorer)
 - [ ] "Open the explorer" shows a dark chart with a smooth blue wave, orange dots (the samples) and a white stepped line (what the converter reports), four sliders (Signal, Sample rate, Resolution, Noise) and a sentence about the Nyquist limit.
 - [ ] Default (500 Hz signal, 8,000 Hz sample rate, 6 bits, 2% noise): no aliasing message; "64 levels, 52.4 mV per step"; "48.0 kbit/s".
@@ -181,7 +200,9 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | `src/content/site.ts` | Company name, contact details (owner supplied), PLACEHOLDER description (D-30, D-31) |
 | `src/content/layers.ts` | The five layers: values, names, summaries (PLACEHOLDER), shader mode and seed (D-25) |
 | `src/components/hero/StackViewport.tsx` | Dark viewport used by hero and Systems walk: SVG, then lazily loaded WebGL scene (mounted only once near the screen), error boundary, visibility pausing; props `mode`, `focus`, `className` (D-28, D-36) |
-| `src/components/lab/LabSection.tsx`, `ToolLauncher.tsx`, `CoveragePlanner.tsx`, `SignalScope.tsx` | Lab section with two demos opened on demand: CCTV coverage planner (D-48) and sensor sampling explorer (D-50). `ToolLauncher.tsx` replaced `PlannerLauncher.tsx` |
+| `src/components/lab/LabSection.tsx`, `ToolLauncher.tsx`, `LabControls.tsx`, `CoveragePlanner.tsx`, `SignalScope.tsx`, `LinkReliability.tsx`, `CapacityPlanner.tsx`, `ReadabilityCheck.tsx`, `CodeLab.tsx` | Lab section: six tools opened on demand, one per layer plus a code lab (D-48, D-50, D-54). `LabSection.tsx` is a data list; `LabControls.tsx` holds the shared slider row |
+| `src/components/work/CoverFlow.tsx` | Curved 3D ribbon for the Work screenshots, with the plain strip for Simple mode (D-53). Its CSS is the `.flow-*` block in `globals.css` |
+| `docs/principles-brief.md` | Exactly what the owner must send for the Principles section (D-55) |
 | `src/components/work/WorkSection.tsx` | Work section: text column plus real screenshots, swipe strip on phones (D-37) |
 | `src/content/work.ts` | Project facts and screenshot metadata, from the owner's own text. No invented outcomes |
 | `public/work/` | WebP screenshots (8 files, about 400 KB in total) for SMS Malawi and Saviour Digital Solutions |
@@ -200,7 +221,7 @@ Phone, width sweep (browser device emulation, then real devices). Check each of 
 | `src/components/shell/ScrollEngine.tsx` | Renders nothing. Writes `--page-progress`; starts GSAP ScrollTrigger and (fine-pointer, Tier 1+) Lenis, lazily |
 | `src/components/shell/Header.tsx` | Sticky header, logo, links from `lg`, orange progress bar |
 | `src/components/shell/CommandPalette.tsx` | Menu button and cmdk palette (full-screen on phone) |
-| `src/components/shell/SimpleModeToggle.tsx`, `Footer.tsx` | Simple mode control and minimal footer |
+| `src/components/shell/SimpleModeToggle.tsx`, `Footer.tsx` | Simple mode control (has an `onDark` variant) and the dark four-band footer (D-52) |
 | `docs/` | This file, `DECISIONS.md`, brand pack README and contrast notes |
 
 ## 5. Remaining work
@@ -252,7 +273,8 @@ If the log says something else, send me that one line (it contains no visitor de
 
 ## 5b. Launching to search engines (M5a)
 The site is public at https://5ivestack-labs.vercel.app but tells search engines to ignore it (D-44). To launch:
-1. Finish or approve the PLACEHOLDER copy (hero headline, site description, layer summaries) and remove `/tokens` (delete `src/app/tokens/`).
+1. Copy: the site description and layer summaries are approved and polished (D-51). Confirm the hero headline (Q-12). Delete `src/app/tokens/` if it still exists in your project.
+   Principles section: optional for launch; see `docs/principles-brief.md`.
 2. Fill the remaining privacy facts (section 5a step 1) and activate the form.
 3. If you attach a custom domain, set it in `site.url` (`src/content/site.ts`).
 4. Set `SITE_INDEXABLE=true` in Vercel (Production) and redeploy. Pages become indexable, `/robots.txt` allows crawling (except `/api/` and `/tokens`), and `/sitemap.xml` lists the home page and the Privacy Notice.
@@ -269,18 +291,19 @@ Status: **Answered** (decision recorded), **Partly** (some information received)
 | Q-02 | Value-to-layer mapping | **Answered 15 Nov 2026: confirmed** | Owner asked to replace the buzzwords "Innovation" and "Creativity". Replaced with Scalability (L4) and Usability (L5), see D-25 and Q-11 |
 | Q-03 | Destination email, phone and WhatsApp | **Answered 15 Nov 2026** | fivestacklabs@gmail.com, +265 991 974 388. Live in the hero (email is the primary button), footer, command palette, and the consultation form's destination (`CONSULT_TO`). Needs a Resend account created with this same address (section 5a) |
 | Q-04 | Flagship projects (name, one line, owner's role, stack, real outcomes, 3 to 6 images, permission) | **Mostly answered 15 Nov 2026** | SMS Malawi and Saviour Digital Solutions are in the Work section with the owner's description, role (Developer), live links and four screenshots each. Saviour: built with HTML, CSS and JavaScript. Still open: the SMS Malawi stack, any real outcomes (numbers, client results), and a written OK that the client names and the school's photo shown in the screenshots may appear publicly. More projects "will come later" |
-| Q-05 | Details of the 2 to 3 Lab experiments | **Open** (owner will send later) | Default: Lab ships with the two added demos only |
-| Q-06 | Company text: description, one line per service, social links | **Partly** | Owner approved a PLACEHOLDER description (written, D-31). Still open: real text, and social links (none supplied) |
+| Q-05 | Details of the 2 to 3 Lab experiments | **Answered 18 Nov 2026** | The owner has no experiments of their own and asked for labs matching the five layers, including a coding lab. Built as six tools (D-54). Owner may still add their own later |
+| Q-06 | Company text: description, one line per service, social links | **Partly** | The description and layer summaries were approved and polished on 18 Nov 2026 (D-51). Still open: social links (none supplied) |
 | Q-07 | Analytics | **Open, default none** | None in v1. Adding any requires a privacy notice change first |
 | Q-08 | Privacy wording for the consultation form | **Answered 16 Nov 2026: reviewed** | The owner confirmed a Malawian lawyer reviewed `/privacy` the night of 15 Nov 2026; `reviewed: true` is set (D-43). Keep the lawyer's written confirmation |
 | Q-09 | Production domain and DNS access | **Partly answered 15 Nov 2026** | Live at https://5ivestack-labs.vercel.app (the site stays noindex). Still open: a custom domain, if wanted |
 | Q-10 | Test devices | **Answered 15 Nov 2026** | Samsung S20 Ultra (about 412px wide). Owner's priority: seamless on any phone size, because customers have different phones. Covered by the M2 width-sweep checklist (320 to 430, tablet, landscape) |
 | Q-11 | Confirm the new L4 and L5 words: **Scalability** and **Usability** | **Answered 15 Nov 2026: confirmed** | Live in `src/content/layers.ts` |
-| Q-12 | Hero headline and primary call to action | **Partly answered 15 Nov 2026** | Owner asked for something catchier in the same direction, and for email to be the primary action. Now: "From sensor to screen, we build every layer." with an orange "Email us" button (subject prefilled) and WhatsApp as the secondary link. Still PLACEHOLDER until the owner approves. Alternatives are in D-38 |
-| Q-13 | Legal entity name, registration details and address | **Partly answered 16 Nov 2026** | Address supplied: "M & L Attorneys, Private Bag 202, Blantyre, Malawi" (entered as given; **please confirm** whether this is the registered office or the law firm's contact, and whether it should read "c/o"). Retention for enquiries: 1 year (entered). MACRA contact filled from MACRA's own complaints page. **Still needed:** the registered legal entity name, retention for server logs, retention for contract records |
+| Q-12 | Hero headline and primary call to action | **Partly answered 15 Nov 2026** | Owner asked for something catchier in the same direction, and for email to be the primary action. Now: "From sensor to screen, we build every layer." with an orange "Email us" button (subject prefilled) and WhatsApp as the secondary link. The 18 Nov 2026 approval named the hero description and layer summaries, not the headline: please confirm "From sensor to screen, we build every layer." or pick an alternative from D-38 |
+| Q-13 | Legal entity name, registration details and address | **Partly answered 16 Nov 2026** | Address supplied: "M & L Attorneys, Private Bag 202, Blantyre, Malawi" (entered as given; **please confirm** whether this is the registered office or the law firm's contact, and whether it should read "c/o"). Retention for enquiries: 1 year (entered). MACRA contact filled from MACRA's own complaints page. **Still needed:** the registered legal entity name (exactly as on the company registration certificate, for example "... Limited"; the owner asked what is wanted on 18 Nov 2026), retention for server logs, retention for contract records. Also confirm whether the M & L Attorneys address is the registered office |
 | Q-14 | Real device test results from the first-run checklists (M0, M1, M2) | **Open** | Blocks calling any milestone "done" |
 | Q-15 | Add a visible "Pause animation" button near the hero (WCAG 2.2.2)? | **Answered 16 Nov 2026: no** | The owner declined. It was built and then fully removed. The remaining way to stop the animation is Simple mode (footer and Menu) and the visitor's reduced-motion setting. WCAG 2.2.2 is a Level A criterion; the owner has accepted the gap (recorded in `docs/accessibility-review.md`) |
-| Q-16 | Launch date, and approval of the placeholder copy (hero description, layer summaries) | **Open** | Needed before `SITE_INDEXABLE=true` (section 5b) |
+| Q-16 | Launch date, and approval of the placeholder copy (hero description, layer summaries) | **Partly answered 18 Nov 2026** | Copy approved (D-51). Launch date still open; needed before `SITE_INDEXABLE=true` (section 5b) |
+| Q-17 | Principles section content (four to six principles, each with a true story) | **Open** | Exactly what is needed is in `docs/principles-brief.md` (D-55). Nothing is built or shown until supplied |
 
 Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (light page with dark viewports), English only, Vercel hosting, owner can run npm and pnpm locally, logo and icon files supplied (the pack also has SVG variants without a background, usable if the reverse horizontal's own background is a problem), Switzer font supplied.
 
@@ -297,7 +320,8 @@ Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (
 - **Latin-only font subset:** no arrows or non-Latin characters in copy.
 - **M2 is the least-tested code in the repo:** the GLSL shader, orthographic camera fit, scroll-linked animation and FPS step-down were never run. Expect fixes after the first real run (shader compile errors, framing, colour). The static SVG and error boundary mean a failure should degrade to the SVG, but verify that too.
 - **iOS Safari WebGL quirks** are expected; the scene has a context-lost fallback to the SVG. No iPhone has been tested yet.
-- **Placeholder copy** is live in the hero and layers list (D-31). Do not launch with it.
+- **Copy:** description and layer summaries are approved (D-51); only the hero headline still needs a yes (Q-12).
+- **Code lab and CSP:** the Lab's code tool runs in a Blob web worker. When the Content-Security-Policy task is done, the policy must allow `worker-src blob:` (D-54) or that tool breaks.
 - **Privacy notice is a draft** and the form (M4) must not go live without the reviewed notice and the checkbox (Part C of the draft).
 - **The plan's reference copy** mentions `create-next-app` and installing everything in M0. That is superseded by D-02.
 
@@ -323,3 +347,4 @@ Answered earlier: audience (local SMEs, schools, enterprises, partners), theme (
 | 16 Nov 2026 | Claude | Owner declined the pause-animation button: built and fully removed (Q-15 answered no). Owner reported the consultation form shows "We could not send your request" after adding the Resend key in Vercel. Hardened `/api/consult`: logs the provider's error name and message (no visitor data), catches network failures, trims spaces and quotes from the environment values. Added troubleshooting steps (section 5a). Built M3c: Lab section with a working CCTV coverage planner (opens on demand, touch handles, keyboard support), Lab in the nav. Nothing run on a device. |
 | 16 Nov 2026 | Claude | Owner sent the Vercel log line `consult: email provider returned status 401`. Checked Resend's error documentation: 401 is `missing_api_key` (Resend does not recognise the key: wrong, deleted or inactive). Added the exact fix and a PowerShell test to section 5a. Noted that the owner's log is in the old format, so the diagnostic update from the previous delivery has not been deployed yet. No code change. |
 | 16 Nov 2026 | Claude | Owner confirmed Resend email now works (A-09 resolved). Built the second Lab demo, the sensor sampling explorer (D-50), and generalised the launcher (`ToolLauncher.tsx` replaces `PlannerLauncher.tsx`, which must be deleted from the project). Sampling arithmetic checked in Node. Nothing run on a device. |
+| 18 Nov 2026 | Claude | Read the handoff, decisions, memory and code. Owner answered: no own Lab experiments (build labs for the five layers plus a coding lab), the company is registered with the Malawi government (asked what the entity name means), approved the placeholder copy with polish, asked for the Principles requirements in detail, a modern footer, and a creative display for the Work photos (chose the 3D coverflow). Done: copy polished (D-51); footer redesigned (D-52); Work screenshots as a curved 3D ribbon (D-53); Lab expanded to six tools (D-54); `docs/principles-brief.md` (D-55); old slider rows made phone-safe. Checked: banned-pattern and contrast scripts pass; Lab maths and examples tested in Node; the real gallery and Lab components bundled and run in headless Chromium (screenshots, touch swipe, drag, keyboard, infinite-loop stop). Not run: `pnpm install`, `pnpm build`, `pnpm lint`, `pnpm typecheck` (cannot install packages here; an approximate type check with stubbed types found no real errors), the full site, any real phone. |

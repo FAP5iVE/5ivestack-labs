@@ -297,6 +297,37 @@ Source of the original plan: https://claude.ai/artifact/NDUbsn3XwpXhLgS4CvWpre (
 - **Launcher:** both tools now share `ToolLauncher.tsx` (each tool is its own lazy chunk, loaded only when its button is pressed). `PlannerLauncher.tsx` is deleted.
 **Status:** Decided. Unverified on devices.
 
+## D-51 Placeholder copy approved and polished (18 Nov 2026)
+**Decision:** The owner approved the placeholder hero description and layer summaries ("YES, but polish for professional alignment"). Rewritten in `src/content/site.ts` and `src/content/layers.ts`: the description now opens with "We are a registered Malawian technology company" (the owner's own statement that the company is registered with the Malawi government) and lists the services in the owner's scope; each layer summary says what is built and for whom, with no outcomes or numbers. The consultation summary changed from "Independent advice" to "Practical advice" because independence was never stated by the owner.
+**Not covered:** the hero headline "From sensor to screen, we build every layer." was not named in the approval; it stays as is and is listed as a question (Q-12).
+**Supersedes:** the PLACEHOLDER marking in D-31 for the description and layer summaries.
+**Status:** Decided.
+
+## D-52 Footer redesigned (18 Nov 2026)
+**Decision:** The flat footer became a dark ink surface (like the viewports) in four bands: a call to action (large headline, orange "Email us", link to the consultation), the five values as five segments (each fills orange on hover), link columns (logo, Explore, Contact, Display and legal with the Simple mode toggle), and a legal line with "Back to top". Section links use `/#id` so they work from `/privacy`. `data-viewport` on the footer flips the focus ring to paper. Colours follow D-05: paper text, sky for secondary text, orange only for the action and hover. `SimpleModeToggle` gained an `onDark` prop. The reverse logo's own background equals ink, so it sits flush. The footer says "Registered in Malawi", from the owner's statement.
+**Rejected:** a giant wordmark (cannot be checked for overflow at every width without a browser), gradients and glows (banned), cards.
+**Status:** Decided. Unverified on a real site build and on phones.
+
+## D-53 Work screenshots as a curved 3D ribbon (18 Nov 2026)
+**Decision:** The owner chose the "3D perspective coverflow stack": a convex ribbon whose centre card faces the viewer while neighbours curve away along an outward arc and tuck behind it. Built with CSS 3D transforms and z-index only (`src/components/work/CoverFlow.tsx`, `.flow-*` rules in `globals.css`); no new packages. Swipe or drag sideways, arrow keys, Home and End, press a side card, or Previous and Next buttons. `touch-action: pan-y` keeps vertical swipes scrolling the page; pointer capture starts only after an 8 px drag so plain presses still reach the buttons. Tier 0 (Simple mode, reduced motion, Save-Data) and no-JavaScript visitors keep the plain swipeable strip from D-37, because Simple mode promises no 3D. No pinning on vertical scroll (carried-forward rule for phones).
+**Not built:** the mute and unmute video pill from the owner's notes. There are no videos yet. When screen recordings exist, the image list can take a video entry and the pill can be added to the centre card only.
+**Verification:** bundled and run in headless Chromium with the real component and CSS: arc and depth look right at 390 and 1000 px, no horizontal overflow, touch swipe, mouse drag, keyboard and side-card press all change the screenshot, and a vertical touch swipe scrolls the page without changing it. Not yet seen on the live site or a real phone.
+**Status:** Decided.
+
+## D-54 Lab expanded to one tool per layer plus a code lab (18 Nov 2026)
+**Decision:** The owner has no experiments of their own and asked for labs matching the five layers, including a coding lab. The Lab now has six tools in layer order: L1 sensor sampling explorer (D-50), L2 device link reliability, L3 CCTV coverage planner (D-48), L4 server capacity planner, L5 readability and touch-target check, and a code lab. `LabSection.tsx` is data-driven. Each tool is its own lazy chunk behind `ToolLauncher`. Shared slider row and helpers are in `LabControls.tsx`; the slider rows of the two older tools were made phone-safe at 320 px.
+- **L2 link reliability:** one report a minute; each attempt lost independently with the chosen chance; retries; offline alert after N missed reports. Maths: lost report = p^(retries+1); average attempts = (1 - p^n) / (1 - p); false alerts per day = 1440 x (1 - q) x q^N where q is the lost-report chance. Honest framing: real losses come in bursts.
+- **L4 capacity planner:** each server is an M/M/1 queue, response time = 1 / (capacity per server - arrivals per server). Honest framing: no caching, databases or bursts.
+- **L5 readability check:** WCAG relative luminance and contrast ratio; large text from 24 px (18.66 px bold); target size 24 px (WCAG 2.2, 2.5.8, AA) and 44 px (2.5.5, AAA). Colours start as the site's ink and paper. Checks two rules only, and says so.
+- **Code lab:** JavaScript runs in a Web Worker made from a Blob. It is stopped after 2 seconds, the network functions (fetch, XMLHttpRequest, WebSocket, EventSource, importScripts, BroadcastChannel, IndexedDB, caches) are switched off, output is capped at 200 lines, the code cannot reach the page (no `document`). Three examples: moving average, CRC-8, binary search. This is a convenience limit for the visitor's own code on their own device, not a security boundary against a determined visitor, and the page says only what is true (stops after 2 s, network calls switched off, nothing sent or saved). **A future Content-Security-Policy must allow `worker-src blob:`** or the code lab breaks.
+- **Privacy:** every tool runs in the browser only; nothing is collected, so the privacy notice needs no change.
+**Verification:** all maths checked in Node (formula against a 20,000-report simulation; contrast against WCAG reference values; CRC-8 gives the standard check value 0xF4 for "123456789"). All four new tools rendered in headless Chromium at 320 to 1000 px with no console errors and no sideways scroll; an infinite loop is stopped after about 2.4 s, a syntax error and a DOM access attempt are reported, and 500 output lines are cut to 200. Not yet seen in the built site or on a phone.
+**Status:** Decided.
+
+## D-55 Principles section needs content from the owner (18 Nov 2026)
+**Decision:** The owner asked for the exact requirements. They are in `docs/principles-brief.md`. The section is not built and no placeholder is shown until at least four complete principles (rule, layer, true story, cost, permission) are supplied. No story is invented.
+**Status:** Waiting on the owner.
+
 ---
 
 ## Carried-forward decisions from the plan (still in force)

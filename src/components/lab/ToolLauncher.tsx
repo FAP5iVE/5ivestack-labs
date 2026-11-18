@@ -4,13 +4,17 @@ import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
 /*
-  Opens a Lab tool on demand (decision D-48, D-50). Each tool is its own lazily loaded
+  Opens a Lab tool on demand (decisions D-48, D-50, D-54). Each tool is its own lazily loaded
   chunk, so nothing downloads or runs until the visitor presses the button.
 */
 const loading = () => <p className="text-body text-ink-muted">Loading.</p>;
 const tools = {
   planner: dynamic(() => import("./CoveragePlanner"), { ssr: false, loading }),
   scope: dynamic(() => import("./SignalScope"), { ssr: false, loading }),
+  link: dynamic(() => import("./LinkReliability"), { ssr: false, loading }),
+  capacity: dynamic(() => import("./CapacityPlanner"), { ssr: false, loading }),
+  readability: dynamic(() => import("./ReadabilityCheck"), { ssr: false, loading }),
+  code: dynamic(() => import("./CodeLab"), { ssr: false, loading }),
 };
 
 export function ToolLauncher({

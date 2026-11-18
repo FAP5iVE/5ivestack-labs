@@ -12,6 +12,6 @@ export type NavItem = {
 export const navItems: readonly NavItem[] = [
   { label: "Systems", href: "#systems", keywords: ["layers", "services", "what we do", "hardware", "software"] },
   { label: "Work", href: "#work", keywords: ["projects", "portfolio", "case studies", "sms malawi", "saviour"] },
-  { label: "Lab", href: "#lab", keywords: ["tools", "experiments", "demo", "cctv", "planner", "coverage", "sensor", "sampling", "adc"] },
+  { label: "Lab", href: "#lab", keywords: ["tools", "experiments", "demo", "cctv", "planner", "coverage", "sensor", "sampling", "adc", "reliability", "capacity", "contrast", "accessibility", "code", "javascript"] },
   { label: "Consult", href: "#consult", keywords: ["contact", "quote", "enquiry", "request", "talk"] },
 ];

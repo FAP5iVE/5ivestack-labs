@@ -1,12 +1,11 @@
-import Image from "next/image";
 import { projects } from "@/content/work";
+import { CoverFlow } from "./CoverFlow";
 
 /*
-  Selected work (decision D-37). Each project is a text column plus a row of real
-  screenshots. On phones the screenshots form a swipeable strip inside their own
-  scroll box (so the page itself never scrolls sideways); from lg up they sit in
-  a two-column grid. No cards: hairline rules only. Screenshots are content and
-  keep a thin border so light pages stay visible on the light background.
+  Selected work (decisions D-37 and D-53). Each project is a text column plus its real
+  screenshots, shown by CoverFlow as a curved 3D ribbon (or, in Simple mode and for
+  reduced motion, the plain swipeable strip). No cards: hairline rules only. Screenshots
+  are content and keep a thin border so light pages stay visible on the light background.
 */
 export function WorkSection() {
   return (
@@ -63,27 +62,7 @@ export function WorkSection() {
             </div>
 
             <div className="mt-8 lg:col-span-8 lg:mt-0">
-              <ul
-                tabIndex={0}
-                aria-label={`${project.name} screenshots`}
-                className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 lg:grid lg:grid-cols-2 lg:overflow-visible lg:pb-0"
-              >
-                {project.images.map((image) => (
-                  <li key={image.src} className="w-[85%] shrink-0 snap-start lg:w-auto">
-                    <Image
-                      src={image.src}
-                      alt={image.alt}
-                      width={image.width}
-                      height={image.height}
-                      sizes="(min-width: 1024px) 28rem, 85vw"
-                      className="h-auto w-full border border-rule"
-                    />
-                  </li>
-                ))}
-              </ul>
-              <p className="mt-2 text-small text-ink-muted lg:hidden">
-                Swipe to see more screens.
-              </p>
+              <CoverFlow name={project.name} images={project.images} />
             </div>
           </article>
         ))}
