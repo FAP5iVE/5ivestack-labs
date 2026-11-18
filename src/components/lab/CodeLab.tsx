@@ -3,44 +3,16 @@
 import { useEffect, useRef, useState } from "react";
 
 /*
-  Code lab (Lab, decision D-54, software layers L4 and L5). A small JavaScript playground.
-  The code you type runs inside a Web Worker created in your browser: it cannot touch the
-  page, it is stopped after 2 seconds, its network functions are switched off, and the
-  output is capped. Nothing you type is sent anywhere or saved. (A future
-  Content-Security-Policy must allow worker-src blob: for this tool; see HANDOFF.)
+  Code lab (Lab, decision D-54 and D-57, software layers L4 and L5). A small JavaScript
+  playground. The code you type runs inside a Web Worker (public/lab/code-worker.js): it cannot
+  touch the page, it is stopped after 2 seconds, and the output is capped. The worker file is
+  served with its own Content-Security-Policy (next.config.ts) that switches off every network
+  request and allows code evaluation for that worker only, so the rest of the site keeps a
+  policy without 'unsafe-eval'. Nothing you type is sent anywhere or saved.
 */
 
 const LIMIT_MS = 2000;
-
-const WORKER_SOURCE = `
-"use strict";
-for (const name of ["fetch", "XMLHttpRequest", "WebSocket", "EventSource", "importScripts", "BroadcastChannel", "indexedDB", "caches"]) {
-  try { Object.defineProperty(self, name, { value: undefined, writable: false, configurable: false }); } catch (e) {}
-}
-const MAX_LINES = 200;
-const MAX_CHARS = 20000;
-self.onmessage = (event) => {
-  const lines = [];
-  let chars = 0;
-  let truncated = false;
-  const show = (v) => {
-    if (typeof v === "string") return v;
-    if (typeof v === "undefined" || typeof v === "function") return String(v);
-    try { return JSON.stringify(v); } catch (e) { return String(v); }
-  };
-  const log = (...args) => {
-    if (lines.length >= MAX_LINES || chars >= MAX_CHARS) { truncated = true; return; }
-    const line = args.map(show).join(" ");
-    chars += line.length;
-    lines.push(line);
-  };
-  const fakeConsole = { log, info: log, warn: log, error: log };
-  let error = null;
-  try { new Function("console", event.data)(fakeConsole); }
-  catch (e) { error = e && e.message ? (e.name + ": " + e.message) : String(e); }
-  self.postMessage({ lines, truncated, error });
-};
-`;
+const WORKER_URL = "/lab/code-worker.js";
 
 export const examples = [
   {
@@ -138,9 +110,7 @@ export default function CodeLab() {
     stop();
     setRunning(true);
     setResult(null);
-    const url = URL.createObjectURL(new Blob([WORKER_SOURCE], { type: "text/javascript" }));
-    const worker = new Worker(url);
-    URL.revokeObjectURL(url);
+    const worker = new Worker(WORKER_URL);
     workerRef.current = worker;
     worker.onmessage = (event: MessageEvent<{ lines: string[]; truncated: boolean; error: string | null }>) => {
       stop();

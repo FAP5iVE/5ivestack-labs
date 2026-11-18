@@ -88,8 +88,9 @@ export default function PrivacyPage() {
 
           <Section id="who" title="1. Who we are">
             <p>
-              <Fact value={privacy.legalEntity} label="legal entity name" />, trading as {site.name},
-              of <Fact value={privacy.address} label="registered address" />, Malawi (&ldquo;we&rdquo;,
+              <Fact value={privacy.legalEntity} label="legal entity name" />
+              {privacy.legalEntity === site.name ? null : <>, trading as {site.name}</>}, of{" "}
+              <Fact value={privacy.address} label="registered address" />, Malawi (&ldquo;we&rdquo;,
               &ldquo;us&rdquo;), is the data controller for the personal data described in this
               notice.
             </p>

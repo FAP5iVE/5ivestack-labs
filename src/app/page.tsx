@@ -44,9 +44,12 @@ export default function Home() {
           <div className="col-span-full lg:col-span-5">
             <h1
               id="hero-title"
-              className="font-display font-wide text-display font-bold"
+              className="font-display font-wide text-display font-bold leading-[1.2]"
             >
-              From sensor to screen, we build every layer.
+              <span className="bg-orange px-1 text-ink box-decoration-clone">
+                Software, web and system development
+              </span>
+              , built around your business.
             </h1>
             <p className="mt-6 max-w-[var(--measure)] text-lead text-ink-muted">
               {site.description}

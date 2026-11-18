@@ -55,7 +55,7 @@ const jetbrains = localFont({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} | Software, embedded systems, networks and CCTV`,
+    default: `${site.name} | Software, web and system development`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -65,14 +65,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: site.name,
-    title: `${site.name} | Software, embedded systems, networks and CCTV`,
+    title: `${site.name} | Software, web and system development`,
     description: site.description,
     url: "/",
     locale: "en_GB",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} | Software, embedded systems, networks and CCTV`,
+    title: `${site.name} | Software, web and system development`,
     description: site.description,
   },
 };

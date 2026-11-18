@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
-import { layers } from "@/content/layers";
 import { navItems } from "@/content/nav";
 import { site } from "@/content/site";
 import { SimpleModeToggle } from "./SimpleModeToggle";
 
 /*
-  Footer (decision D-52). A dark ink surface, like the dark viewports, in four bands:
-  a call to action, the five values, link columns, and a legal line. No cards, gradients,
+  Footer (decisions D-52 and D-59). A dark ink surface, like the dark viewports, in three bands:
+  a call to action, link columns, and a legal line. (The five-values strip was removed at the
+  owner's request on 18 Nov 2026.) No cards, gradients,
   shadows or glow: structure comes from hairlines, type size and the orange accent.
   `data-viewport` flips the focus ring to paper (see globals.css). Colours on ink follow
   D-05: paper for text, sky for secondary text and lines, orange for the action.
@@ -47,29 +47,7 @@ export function Footer() {
         </div>
       </div>
 
-      {/* 2. The five values, one segment each */}
-      <div className="border-t border-paper/25">
-        <div className="grid-page py-12">
-          <ul className="col-span-full grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-5 md:gap-x-6">
-            {[...layers]
-              .sort((a, b) => a.level - b.level)
-              .map((layer) => (
-                <li key={layer.level} className="group">
-                  <span aria-hidden className="relative block h-1 w-full bg-sky/40">
-                    <span className="absolute inset-y-0 left-0 block w-0 bg-orange transition-[width] duration-500 group-hover:w-full" />
-                  </span>
-                  <span className="mt-4 block font-mono text-small tabular-nums text-sky">
-                    L{layer.level}
-                  </span>
-                  <span className="mt-1 block text-body font-medium">{layer.value}</span>
-                  <span className="block text-small text-sky">{layer.name}</span>
-                </li>
-              ))}
-          </ul>
-        </div>
-      </div>
-
-      {/* 3. Link columns */}
+      {/* 2. Link columns */}
       <div className="border-t border-paper/25">
         <div className="grid-page gap-y-12 py-16">
           <div className="col-span-full lg:col-span-4">
@@ -139,7 +117,7 @@ export function Footer() {
         </div>
       </div>
 
-      {/* 4. Legal line */}
+      {/* 3. Legal line */}
       <div className="border-t border-paper/25">
         <div className="grid-page pb-[calc(2rem+var(--safe-bottom))] pt-8">
           <div className="col-span-full flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
