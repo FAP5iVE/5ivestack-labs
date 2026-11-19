@@ -39,7 +39,36 @@ export default function Home() {
           __html: JSON.stringify(organization).replace(/</g, "\\u003c"),
         }}
       />
-      <LaptopHero />
+      <LaptopHero>
+        <div className="grid-page pb-12 pt-24 md:pb-16">
+          <div className="col-span-full lg:col-span-8">
+            <h1 id="hero-title" className="font-display font-wide text-display font-bold">
+              <span className="text-paper">We build what </span>
+              <span className="text-sky">moves business forward.</span>
+            </h1>
+            <p className="mt-6 max-w-[var(--measure)] text-lead text-paper">
+              Software, systems and technology solutions engineered for real-world impact.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-6">
+              <a
+                href={site.emailEnquiryHref}
+                className="inline-flex min-h-11 items-center rounded-control bg-orange px-6 text-body font-medium text-ink"
+              >
+                Email us
+              </a>
+              <a
+                href={site.whatsappHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-11 items-center text-body text-paper underline underline-offset-4"
+              >
+                Message us on WhatsApp
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </LaptopHero>
 
       <SystemsWalk />
       <WorkSection />
