@@ -24,7 +24,17 @@ type Rig = {
   focus: number; // layer level 1 to 5 to highlight, 0 for none (Systems walk)
 };
 
-type Colors = { ink: THREE.Color; paper: THREE.Color; sky: THREE.Color; orange: THREE.Color };
+type Colors = {
+  ink: THREE.Color;
+  paper: THREE.Color;
+  sky: THREE.Color;
+  cobalt: THREE.Color;
+  orange: THREE.Color;
+};
+
+// Light tone (D-61) draws on the page surface: paper slabs, ink edges, cobalt structure lines.
+// Dark tone is the original: ink slabs, paper edges, sky structure lines.
+type Tone = "light" | "dark";
 
 // Colours come from the CSS tokens so there is one source of truth.
 function readToken(name: string): THREE.Color {
@@ -50,6 +60,7 @@ uniform float uTime;
 uniform float uSeed;
 uniform float uReveal;
 uniform float uDim;
+uniform float uBody;
 uniform vec3 uSky;
 uniform vec3 uOrange;
 varying vec2 vUv;
@@ -177,7 +188,7 @@ void main() {
   float vis = 1.0 - smoothstep(uReveal * 1.2 - 0.2, uReveal * 1.2, sweep);
 
   vec3 col = mix(uSky, uOrange, clamp(sig, 0.0, 1.0));
-  float alpha = max(body * 0.6, sig) * vis * mix(1.0, 0.3, uDim);
+  float alpha = max(body * uBody, sig) * vis * mix(1.0, 0.3, uDim);
   gl_FragColor = vec4(col, alpha);
   #include <colorspace_fragment>
 }
@@ -191,7 +202,17 @@ function spacingOf(rig: Rig): number {
   return (0.22 + 0.78 * rig.assemble) * (1 + 0.25 * rig.explode);
 }
 
-function Stack({ rig, tier, colors }: { rig: RefObject<Rig>; tier: 1 | 2; colors: Colors }) {
+function Stack({
+  rig,
+  tier,
+  tone,
+  colors,
+}: {
+  rig: RefObject<Rig>;
+  tier: 1 | 2;
+  tone: Tone;
+  colors: Colors;
+}) {
   const groupRef = useRef<THREE.Group>(null);
   const slabRefs = useRef<(THREE.Group | null)[]>([]);
   const matRefs = useRef<(THREE.ShaderMaterial | null)[]>([]);
@@ -201,6 +222,11 @@ function Stack({ rig, tier, colors }: { rig: RefObject<Rig>; tier: 1 | 2; colors
   const fitted = useRef(false);
   const edgeRefs = useRef<(THREE.LineBasicMaterial | null)[]>([]);
   const focusAmt = useRef<number[]>([0, 0, 0, 0, 0]);
+
+  const light = tone === "light";
+  const slabColor = light ? colors.paper : colors.ink;
+  const edgeColor = light ? colors.ink : colors.paper;
+  const structureColor = light ? colors.cobalt : colors.sky;
 
   const box = useMemo(() => new THREE.BoxGeometry(SLAB, THICKNESS, SLAB), []);
   const edges = useMemo(() => new THREE.EdgesGeometry(box), [box]);
@@ -212,10 +238,11 @@ function Stack({ rig, tier, colors }: { rig: RefObject<Rig>; tier: 1 | 2; colors
         uSeed: { value: layer.seed },
         uReveal: { value: 0 },
         uDim: { value: 0 },
-        uSky: { value: colors.sky },
+        uBody: { value: light ? 0.85 : 0.6 },
+        uSky: { value: structureColor },
         uOrange: { value: colors.orange },
       })),
-    [colors],
+    [colors, light, structureColor],
   );
 
   useFrame((state, delta) => {
@@ -288,14 +315,14 @@ function Stack({ rig, tier, colors }: { rig: RefObject<Rig>; tier: 1 | 2; colors
           }}
         >
           <mesh geometry={box}>
-            <meshBasicMaterial color={colors.ink} />
+            <meshBasicMaterial color={slabColor} />
           </mesh>
           <lineSegments geometry={edges}>
             <lineBasicMaterial
               ref={(el) => {
                 edgeRefs.current[i] = el;
               }}
-              color={colors.paper}
+              color={edgeColor}
               transparent
               opacity={0.6}
             />
@@ -373,12 +400,14 @@ export default function StackScene({
   active,
   mode,
   focus,
+  tone,
   onReady,
 }: {
   tier: 1 | 2;
   active: boolean;
   mode: "hero" | "walk";
   focus: number;
+  tone: Tone;
   onReady: () => void;
 }) {
   const rig = useRef<Rig>({ assemble: 0, explode: 0, px: 0, py: 0, focus: 0 });
@@ -387,6 +416,7 @@ export default function StackScene({
       ink: readToken("ink"),
       paper: readToken("paper"),
       sky: readToken("sky"),
+      cobalt: readToken("cobalt"),
       orange: readToken("orange"),
     }),
     [],
@@ -432,6 +462,8 @@ export default function StackScene({
     <div className="absolute inset-0 touch-pan-y">
       <Canvas
         orthographic
+        // Light tone must match the page colour exactly, so no tone mapping (flat).
+        flat={tone === "light"}
         camera={{ position: [12.95, 8, 12.95], zoom: 40, near: 0.1, far: 100 }}
         dpr={[1, tier === 2 ? 2 : 1.5]}
         gl={{
@@ -448,7 +480,7 @@ export default function StackScene({
           onReady();
         }}
       >
-        <Stack rig={rig} tier={tier} colors={colors} />
+        <Stack rig={rig} tier={tier} tone={tone} colors={colors} />
         <FpsGuard />
       </Canvas>
     </div>

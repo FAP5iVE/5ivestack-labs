@@ -6,8 +6,9 @@ import { reportWebglLost, useTierState } from "@/lib/tier";
 import { StackSvg } from "./StackSvg";
 
 /*
-  The dark instrument viewport, used by the hero and by the Systems walk
-  (decisions D-26 to D-28, D-36).
+  The stack viewport, used by the Systems walk (decisions D-26 to D-28, D-36, D-61).
+  tone "light" (default) draws the stack on the page surface itself: no dark box, paper slabs with
+  ink edges. tone "dark" is the original ink box with paper edges.
   - Tier 0 (and while loading, and after any WebGL failure): the static SVG.
   - Tier 1 and 2: the WebGL scene, loaded lazily AFTER hydration and only once the
     viewport has first come near the screen, so a second instance further down the
@@ -15,7 +16,9 @@ import { StackSvg } from "./StackSvg";
   - Rendering pauses while the viewport is off screen.
   - A render error or a lost WebGL context drops the visitor to Tier 0.
   Props:
-    mode  "hero" scrolls and tilts; "walk" keeps layers separated and highlights `focus`.
+    mode  "hero" scrolls and tilts (no longer used on the page since D-60); "walk" keeps layers
+          separated and highlights `focus`.
+    tone  "light" or "dark" surface, see above.
     focus layer level 1 to 5 to highlight (walk mode); 0 for none.
     className sizing classes for the box (default is a 16:15 box).
 */
@@ -44,10 +47,12 @@ class SceneBoundary extends Component<
 export function StackViewport({
   mode = "hero",
   focus = 0,
+  tone = "light",
   className = "aspect-[16/15] w-full",
 }: {
   mode?: "hero" | "walk";
   focus?: number;
+  tone?: "light" | "dark";
   className?: string;
 }) {
   const { tier } = useTierState();
@@ -79,14 +84,14 @@ export function StackViewport({
     <div
       ref={hostRef}
       aria-hidden="true"
-      data-viewport
+      data-viewport={tone === "dark" ? "" : undefined}
       data-tier-view={webgl ? "webgl" : "svg"}
-      className={`relative overflow-hidden bg-ink ${className}`}
+      className={`relative overflow-hidden ${tone === "dark" ? "bg-ink" : "bg-paper"} ${className}`}
     >
       <div
         className={`absolute inset-0 transition-opacity duration-300 ${svgHidden ? "opacity-0" : "opacity-100"}`}
       >
-        <StackSvg focus={focus} />
+        <StackSvg focus={focus} tone={tone} />
       </div>
       {webgl && everVisible ? (
         <SceneBoundary onError={reportWebglLost}>
@@ -96,6 +101,7 @@ export function StackViewport({
             active={visible}
             mode={mode}
             focus={focus}
+            tone={tone}
             onReady={() => setReady(true)}
           />
         </SceneBoundary>

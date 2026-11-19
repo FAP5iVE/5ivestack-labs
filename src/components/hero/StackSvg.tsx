@@ -92,8 +92,21 @@ function pattern(mode: number): Seg[] {
   }
 }
 
-/** `focus` is a layer level (1 to 5) to highlight in the Systems walk; 0 shows all layers equally. */
-export function StackSvg({ focus = 0 }: { focus?: number }) {
+/*
+  `focus` is a layer level (1 to 5) to highlight in the Systems walk; 0 shows all layers equally.
+  `tone` "light" draws paper slabs with ink edges and cobalt structure lines (for the page surface);
+  "dark" draws ink slabs with paper edges and sky structure lines (for an ink box).
+*/
+export function StackSvg({
+  focus = 0,
+  tone = "light",
+}: {
+  focus?: number;
+  tone?: "light" | "dark";
+}) {
+  const light = tone === "light";
+  const slab = light ? "fill-paper stroke-ink" : "fill-ink stroke-paper";
+  const structure = light ? "stroke-cobalt" : "stroke-sky";
   const ordered = [...layers].sort((a, b) => a.level - b.level);
   return (
     <svg
@@ -119,15 +132,15 @@ export function StackSvg({ focus = 0 }: { focus?: number }) {
               transition: "opacity 400ms, transform 400ms",
             }}
           >
-            <path d={left} className="fill-ink stroke-paper" strokeOpacity={0.6} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
-            <path d={right} className="fill-ink stroke-paper" strokeOpacity={0.6} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
-            <path d={top} className="fill-ink stroke-paper" strokeOpacity={0.8} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+            <path d={left} className={slab} strokeOpacity={0.6} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+            <path d={right} className={slab} strokeOpacity={0.6} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+            <path d={top} className={slab} strokeOpacity={0.8} strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
             {pattern(layer.mode).map((seg, i) => (
               <path
                 key={i}
                 d={path(y, seg.pts)}
                 fill="none"
-                className={seg.signal ? "stroke-orange" : "stroke-sky"}
+                className={seg.signal ? "stroke-orange" : structure}
                 strokeOpacity={seg.signal ? 1 : 0.6}
                 strokeWidth={seg.heavy ? 3 : 1.5}
                 strokeLinecap="round"

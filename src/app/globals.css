@@ -214,3 +214,119 @@
     }
   }
 }
+
+/*
+  Laptop hero (D-60, LaptopHero.tsx and laptopRig.ts).
+  Default (server HTML, no JavaScript, reduced motion, Save-Data, Simple mode, no WebGL):
+  the hero is only the screen content, a photo with a flat ink veil and the text.
+  With WebGL the script sets data-laptop="on" on the section. The section then becomes a tall
+  runway with a sticky stage (CSS sticky, no pinning, so phones keep native scrolling). Scrolling
+  opens a 3D laptop and flies the camera into its screen. At the end the screen content is shown
+  flat (data-flat="true") so the text is sharp and the links work.
+  Sizes in px come from the script as custom properties: --screen-w/h (the 16:10 display plane),
+  --frame-w/h (the stage), --frame-x/y (frame offset inside the plane), --flat-x/y (plane offset
+  inside the stage in flat mode). All of them are whole pixels.
+  The veil is a flat 60% ink fill: the brightest pixel of the photo keeps paper text at 4.6:1.
+*/
+@layer components {
+  .hero-root {
+    --hero-stage-h: calc(100svh - var(--header-h) - var(--safe-top));
+    --hero-runs: 2.7; /* runway height as a multiple of the stage height */
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  @media (pointer: coarse) {
+    .hero-root {
+      --hero-runs: 2.2;
+    }
+  }
+  .hero-stage {
+    position: relative;
+    overflow: hidden;
+    min-height: max(var(--hero-stage-h), 30rem);
+  }
+  .hero-home {
+    position: relative;
+  }
+  .hero-screen {
+    position: relative;
+    width: 100%;
+    min-height: max(var(--hero-stage-h), 30rem);
+    overflow: hidden;
+    background: var(--color-ink);
+  }
+  .hero-scrim {
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--color-ink) 60%, transparent);
+  }
+  .hero-frame {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: inherit;
+  }
+  .hero-layer {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .hero-cue,
+  .hero-skip {
+    display: none;
+  }
+
+  .hero-root[data-laptop="on"] .hero-runway {
+    height: calc(var(--hero-stage-h) * var(--hero-runs));
+  }
+  .hero-root[data-laptop="on"] .hero-stage {
+    position: sticky;
+    top: calc(var(--header-h) + var(--safe-top));
+    height: var(--hero-stage-h);
+    min-height: 0;
+  }
+  .hero-root[data-laptop="on"] .hero-home {
+    display: none;
+  }
+  /* Inside the 3D holder the screen fills the holder, which is the display plane. */
+  .hero-root[data-laptop="on"] .hero-screen {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+  }
+  .hero-root[data-laptop="on"] .hero-frame {
+    position: absolute;
+    left: var(--frame-x);
+    top: var(--frame-y);
+    width: var(--frame-w);
+    height: var(--frame-h);
+    min-height: 0;
+  }
+  /* Flat mode: the screen sits straight in the stage at the same size and crop as the 3D plane. */
+  .hero-root[data-laptop="on"][data-flat="true"] .hero-screen {
+    inset: auto;
+    left: var(--flat-x);
+    top: var(--flat-y);
+    width: var(--screen-w);
+    height: var(--screen-h);
+    z-index: 2;
+  }
+  .hero-root[data-laptop="on"] .hero-cue {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 1.5rem;
+    z-index: 3;
+    text-align: center;
+    opacity: max(0, calc(1 - var(--hero-p, 0) * 12));
+    pointer-events: none;
+  }
+  .hero-root[data-laptop="on"][data-flat="true"] .hero-cue {
+    display: none;
+  }
+  .hero-root[data-laptop="on"] .hero-skip {
+    display: block;
+  }
+}
