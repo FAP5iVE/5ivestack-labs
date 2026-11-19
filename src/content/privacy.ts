@@ -14,7 +14,7 @@ export const privacy = {
   /** Registered legal name of the business, e.g. "5iveStack Labs Limited". HANDOFF Q-13. */
   legalEntity: "5iveStack Labs" as string | null, // owner confirmed on 18 Nov 2026: the registered name is exactly "5iveStack Labs" (same as the project name)
   /** Registered address, including "Malawi". HANDOFF Q-13. */
-  address: "M & L Attorneys, Private Bag 202, Blantyre" as string | null, // supplied by the owner; owner confirmed on 18 Nov 2026 that this is the registered office
+  address: "Blantyre, Malawi" as string | null, // supplied by the owner; owner confirmed on 18 Nov 2026 that this is the registered office
   /** A phrase that completes "We keep them ...", e.g. "for up to 24 months after our last contact". */
   retentionEnquiries: "for up to 1 year after our last contact" as string | null,
   /** e.g. "30 days". Confirm with the hosting provider. */
