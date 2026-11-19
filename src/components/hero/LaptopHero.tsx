@@ -89,9 +89,9 @@ export function LaptopHero() {
                       id="hero-title"
                       className="font-display font-wide text-display font-bold"
                     >
-                      We build what moves buusinesses forward
+                      We build what moves business forward
                     </h1>
-                    <p className="mt-6 max-w-[var(--measure)] text-lead">{site.description}</p>
+                    <p className="mt-6 max-w-[var(--measure)] text-lead">software, systems, technology solutions engineered for real-world impact</p>
                     <div className="mt-8 flex flex-wrap items-center gap-6">
                       <a
                         href={site.emailEnquiryHref}
